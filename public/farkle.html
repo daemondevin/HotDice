@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Farkle</title>
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/fomantic-ui@2.9.3/dist/semantic.min.css" />
+        <link rel="stylesheet" type="text/css" href="styles/farkle.css" />
+        <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+        <script type="importmap">
+		  {
+			"imports": {
+                "three": "https://unpkg.com/three@0.138.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.138.0/examples/jsm/",
+                "cannon-es": "https://cdn.skypack.dev/cannon-es"
+			}
+		  }
+		</script>
+        <script src="https://unpkg.com/jquery@3.7.1/dist/jquery.js"></script>
+        <script src="https://unpkg.com/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
+        <script type="module" src="scripts/farkle.js"></script>
+    </head>
+
+    <body class="loading-overlay-showing" data-loading-overlay=""
+        data-plugin-options="{'hideDelay': 500, 'effect': 'cubes'}">
+        <div class="loading-overlay">
+            <div class="bounce-loader">
+                <div class="cssload-thecube">
+                    <div class="cssload-cube cssload-c1"></div>
+                    <div class="cssload-cube cssload-c2"></div>
+                    <div class="cssload-cube cssload-c4"></div>
+                    <div class="cssload-cube cssload-c3"></div>
+                </div>
+            </div>
+        </div>
+        <main class="ui text container">
+
+            <section id="welcome" class="ui blue stacked segment">
+                <div class="particles-wrapper">
+                    <div id="welcome-particles"></div>
+                </div>
+                <div class="ui centered large image">
+                    <?xml version="1.0" encoding="utf-8"?>
+                    <svg viewBox="127.578 100.8379 493.052 163.5485" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+                        <defs>
+                        <style bx:fonts="Bruno Ace SC">@import url(https://fonts.googleapis.com/css2?family=Bruno+Ace+SC%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+                        <style bx:fonts="Montserrat">@import url(https://fonts.googleapis.com/css2?family=Montserrat%3Aital%2Cwght%400%2C100%3B0%2C200%3B0%2C300%3B0%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B0%2C800%3B0%2C900%3B1%2C100%3B1%2C200%3B1%2C300%3B1%2C400%3B1%2C500%3B1%2C600%3B1%2C700%3B1%2C800%3B1%2C900&amp;display=swap);</style>
+                        </defs>
+                        <g id="#1c1d1eff" transform="matrix(1, 0, 0, 1, 0, -0.20208701491355185)">
+                        <path fill="#1c1d1e" opacity="1.00" d="M 439.21 141.13 C 457.87 127.84 476.32 114.24 495.04 101.04 C 477.69 114.05 460.2 126.88 442.78 139.8 C 440.54 141.6 437.51 143.01 436.63 145.96 C 436.03 150.39 440.15 154.38 444.48 154.41 C 467.19 157.98 489.81 162.14 512.43 166.25 C 519.18 166.92 525.89 164.2 531.15 160.11 C 548.05 147.95 564.97 135.82 582.01 123.86 C 584.47 122.08 587.42 120.65 588.96 117.9 C 590.36 114.74 589.2 111.28 588.09 108.23 C 593.41 112 598.91 115.85 602.62 121.34 C 605.06 124.52 605.61 128.57 606.59 132.34 C 609.75 145.91 612.95 159.48 616.24 173.01 C 617.09 179.39 619.92 185.33 620.63 191.72 C 615.1 170.8 610 149.69 604.6 128.7 C 603.74 122.22 594.7 122.58 590.52 125.57 C 571.45 139.14 552.43 152.77 533.4 166.39 C 528.7 169.51 529.09 175.98 530.2 180.82 C 534.3 198.16 538.27 215.59 542.26 232.91 C 542.825 236.26 544.52 242.44 544.52 242.44 C 545.91 250.63 556.68 255.66 563.63 250.59 C 579.87 238.99 596.05 227.29 612.26 215.65 C 613.1 215.13 613.99 214.65 614.86 214.14 C 597.62 226.42 580.78 239.26 563.7 251.76 C 557.6 256.03 551.96 261.28 544.91 263.93 C 537.01 265.52 528.93 263.74 520.97 263.67 C 520.66 261.21 523.3 260.78 524.88 259.88 C 529.22 258.25 533.21 254.89 534.24 250.19 C 535.153 245.83 533.552 242.304 532.69 238.18 C 528.66 221.55 524.92 204.83 521 188.17 C 519.69 181.45 517.49 171.89 509.11 171.37 C 488.52 167.99 467.94 164.54 447.36 161.13 C 443.13 160.34 438.44 159.27 434.4 161.35 C 431.61 162.6 429.91 165.28 428.63 167.93 C 428.46 158.26 430.34 146.71 439.21 141.13 Z"/>
+                        <path d="M 462.846 144.074 C 460.145 146.515 455.214 147.932 451.829 147.238 C 448.438 146.546 447.883 144.008 450.58 141.57 C 453.274 139.127 458.207 137.712 461.594 138.403 C 464.984 139.096 465.54 141.635 462.846 144.074 Z" style="fill: rgb(28, 29, 30); transform-origin: 519.238px 127.364px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, 0)"/>
+                        <path d="M 514.146 107.213 C 511.445 109.655 506.514 111.071 503.129 110.378 C 499.738 109.685 499.183 107.147 501.879 104.708 C 504.574 102.267 509.507 100.851 512.894 101.543 C 516.284 102.235 516.84 104.774 514.146 107.213 Z" style="fill: rgb(28, 29, 30); transform-origin: 570.538px 90.503px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, 0)"/>
+                        <path d="M 577.291 116.058 C 574.589 118.498 569.658 119.914 566.273 119.221 C 562.884 118.529 562.327 115.99 565.024 113.552 C 567.718 111.11 572.651 109.695 576.039 110.386 C 579.429 111.078 579.984 113.618 577.291 116.058 Z" style="fill: rgb(28, 29, 30); transform-origin: 633.682px 99.347px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, -0.000001)"/>
+                        <path d="M 522.248 153.533 C 519.547 155.974 514.616 157.391 511.231 156.697 C 507.84 156.005 507.285 153.467 509.982 151.028 C 512.675 148.586 517.609 147.171 520.996 147.862 C 524.386 148.555 524.942 151.094 522.248 153.533 Z" style="fill: rgb(28, 29, 30); transform-origin: 578.64px 136.823px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, 0)"/>
+                        <path d="M 518.808 130.325 C 516.108 132.766 511.177 134.182 507.79 133.489 C 504.401 132.796 503.845 130.258 506.541 127.82 C 509.235 125.378 514.168 123.963 517.557 124.654 C 520.946 125.346 521.503 127.885 518.808 130.325 Z" style="fill: rgb(28, 29, 30); transform-origin: 575.199px 113.614px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, 0.000001)"/>
+                        <path fill="#1c1d1e" opacity="1.00" d="M 571.252 188.05 C 571.245 183.648 573.784 179.088 577.42 178.95 C 580.076 178.901 583.544 182.413 581.782 189.783 C 580.786 193.398 577.49 196.382 574.487 194.747 C 572.341 193.733 571.407 190.758 571.252 188.05 Z" />
+                        <text style="fill: rgb(28, 29, 30); font-family: 'Bruno Ace SC'; font-size: 94px; white-space: pre;" x="123.741" y="141.54" transform="matrix(0.980376, 0, 0, 0.61017, 6.265308, 138.727142)">10,000</text>
+                        <text style="fill: rgb(51, 51, 51); font-family: Montserrat; font-size: 14.8px; font-weight: 600; letter-spacing: 0.2px; white-space: pre;" x="184.428" y="246.679">THE DICE-ROLLING, RISK-TAKING GAME</text>
+                        </g>
+                    </svg>
+                </div>
+                <div class="ui divider"></div>
+                <div class="looping pulsating transition dimmer">
+                    <div class="content">
+                        <div class="ui grey inverted header">
+                            <i class="dice icon"></i>
+                            <div class="content">
+                                Welcome!
+                                <div class="sub header">Customize Gameplay</div>
+                            </div>
+                        </div>
+                        <div class="ui short scrolling segment">
+                            <div class="ui dividing header">Introduction</div>
+                            <p class="lead">Welcome to the game of 10,000! Also known as <em>Farkle</em>, <em>Hot Dice</em>,
+                                <em>Greed</em>, <em>Squelch</em>, <em>Ziltch</em>, or <em>Zonk</em>. Roll the dice 
+                                in hopes for scoring ponts! Should you play it safe and take your points, or keep rolling for 
+                                more points and risk losing them all in a Farkle? Let's find out and play..
+                            </p>
+                            <div class="ui dividing header">Options</div>
+                            There's going to be
+                            <div id="players" class="ui inline compact dropdown">
+                                <input type="hidden" id="player-input" name="players" value="2">
+                                <div class="text">two</div>
+                                <i class="dropdown icon"></i>
+                                <div class="menu">
+                                    <div class="item" data-value="1">one</div>
+                                    <div class="item" data-value="2">two</div>
+                                    <div class="item" data-value="3">three</div>
+                                    <div class="item" data-value="4">four</div>
+                                    <div class="item" data-value="5">five</div>
+                                    <div class="item" data-value="6">six</div>
+                                    <div class="item" data-value="7">seven</div>
+                                </div>
+                            </div>
+                            players..
+                        </div>
+                        <button class="ui primary new game,, button" data-tooltip="Start the game!"
+                            data-variation="tiny basic">New Game</button>
+                        <button class="ui right floated primary rules button"
+                            data-tooltip="Learn to play or review the scoring chart."
+                            data-variation="tiny basic">Show Rules</button>
+                    </div>
+                    <div class="ui simple medium dimmer"></div>
+                </div>
+            </section>
+
+            <section id="rules" class="ui blue stacked segment">
+                <div class="particles-wrapper">
+                    <div id="rules-particles"></div>
+                </div>
+                <div class="ui centered large image">
+                    <?xml version="1.0" encoding="utf-8"?>
+                    <svg viewBox="127.578 100.8379 493.052 163.5485" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+                        <defs>
+                        <style bx:fonts="Bruno Ace SC">@import url(https://fonts.googleapis.com/css2?family=Bruno+Ace+SC%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+                        <style bx:fonts="Montserrat">@import url(https://fonts.googleapis.com/css2?family=Montserrat%3Aital%2Cwght%400%2C100%3B0%2C200%3B0%2C300%3B0%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B0%2C800%3B0%2C900%3B1%2C100%3B1%2C200%3B1%2C300%3B1%2C400%3B1%2C500%3B1%2C600%3B1%2C700%3B1%2C800%3B1%2C900&amp;display=swap);</style>
+                        </defs>
+                        <g id="#1c1d1eff" transform="matrix(1, 0, 0, 1, 0, -0.20208701491355185)">
+                        <path fill="#1c1d1e" opacity="1.00" d="M 439.21 141.13 C 457.87 127.84 476.32 114.24 495.04 101.04 C 477.69 114.05 460.2 126.88 442.78 139.8 C 440.54 141.6 437.51 143.01 436.63 145.96 C 436.03 150.39 440.15 154.38 444.48 154.41 C 467.19 157.98 489.81 162.14 512.43 166.25 C 519.18 166.92 525.89 164.2 531.15 160.11 C 548.05 147.95 564.97 135.82 582.01 123.86 C 584.47 122.08 587.42 120.65 588.96 117.9 C 590.36 114.74 589.2 111.28 588.09 108.23 C 593.41 112 598.91 115.85 602.62 121.34 C 605.06 124.52 605.61 128.57 606.59 132.34 C 609.75 145.91 612.95 159.48 616.24 173.01 C 617.09 179.39 619.92 185.33 620.63 191.72 C 615.1 170.8 610 149.69 604.6 128.7 C 603.74 122.22 594.7 122.58 590.52 125.57 C 571.45 139.14 552.43 152.77 533.4 166.39 C 528.7 169.51 529.09 175.98 530.2 180.82 C 534.3 198.16 538.27 215.59 542.26 232.91 C 542.825 236.26 544.52 242.44 544.52 242.44 C 545.91 250.63 556.68 255.66 563.63 250.59 C 579.87 238.99 596.05 227.29 612.26 215.65 C 613.1 215.13 613.99 214.65 614.86 214.14 C 597.62 226.42 580.78 239.26 563.7 251.76 C 557.6 256.03 551.96 261.28 544.91 263.93 C 537.01 265.52 528.93 263.74 520.97 263.67 C 520.66 261.21 523.3 260.78 524.88 259.88 C 529.22 258.25 533.21 254.89 534.24 250.19 C 535.153 245.83 533.552 242.304 532.69 238.18 C 528.66 221.55 524.92 204.83 521 188.17 C 519.69 181.45 517.49 171.89 509.11 171.37 C 488.52 167.99 467.94 164.54 447.36 161.13 C 443.13 160.34 438.44 159.27 434.4 161.35 C 431.61 162.6 429.91 165.28 428.63 167.93 C 428.46 158.26 430.34 146.71 439.21 141.13 Z"/>
+                        <path d="M 462.846 144.074 C 460.145 146.515 455.214 147.932 451.829 147.238 C 448.438 146.546 447.883 144.008 450.58 141.57 C 453.274 139.127 458.207 137.712 461.594 138.403 C 464.984 139.096 465.54 141.635 462.846 144.074 Z" style="fill: rgb(28, 29, 30); transform-origin: 519.238px 127.364px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, 0)"/>
+                        <path d="M 514.146 107.213 C 511.445 109.655 506.514 111.071 503.129 110.378 C 499.738 109.685 499.183 107.147 501.879 104.708 C 504.574 102.267 509.507 100.851 512.894 101.543 C 516.284 102.235 516.84 104.774 514.146 107.213 Z" style="fill: rgb(28, 29, 30); transform-origin: 570.538px 90.503px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, 0)"/>
+                        <path d="M 577.291 116.058 C 574.589 118.498 569.658 119.914 566.273 119.221 C 562.884 118.529 562.327 115.99 565.024 113.552 C 567.718 111.11 572.651 109.695 576.039 110.386 C 579.429 111.078 579.984 113.618 577.291 116.058 Z" style="fill: rgb(28, 29, 30); transform-origin: 633.682px 99.347px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, -0.000001)"/>
+                        <path d="M 522.248 153.533 C 519.547 155.974 514.616 157.391 511.231 156.697 C 507.84 156.005 507.285 153.467 509.982 151.028 C 512.675 148.586 517.609 147.171 520.996 147.862 C 524.386 148.555 524.942 151.094 522.248 153.533 Z" style="fill: rgb(28, 29, 30); transform-origin: 578.64px 136.823px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, 0)"/>
+                        <path d="M 518.808 130.325 C 516.108 132.766 511.177 134.182 507.79 133.489 C 504.401 132.796 503.845 130.258 506.541 127.82 C 509.235 125.378 514.168 123.963 517.557 124.654 C 520.946 125.346 521.503 127.885 518.808 130.325 Z" style="fill: rgb(28, 29, 30); transform-origin: 575.199px 113.614px;" transform="matrix(0.999848, -0.017452, 0.017452, 0.999848, 0, 0.000001)"/>
+                        <path fill="#1c1d1e" opacity="1.00" d="M 571.252 188.05 C 571.245 183.648 573.784 179.088 577.42 178.95 C 580.076 178.901 583.544 182.413 581.782 189.783 C 580.786 193.398 577.49 196.382 574.487 194.747 C 572.341 193.733 571.407 190.758 571.252 188.05 Z" />
+                        <text style="fill: rgb(28, 29, 30); font-family: 'Bruno Ace SC'; font-size: 94px; white-space: pre;" x="123.741" y="141.54" transform="matrix(0.980376, 0, 0, 0.61017, 6.265308, 138.727142)">10,000</text>
+                        <text style="fill: rgb(51, 51, 51); font-family: Montserrat; font-size: 14.8px; font-weight: 600; letter-spacing: 0.2px; white-space: pre;" x="184.428" y="246.679">THE DICE-ROLLING, RISK-TAKING GAME</text>
+                        </g>
+                    </svg>
+                </div>
+                <div class="ui divider"></div>
+                <div class="looping pulsating transition dimmer">
+                    <div class="content">
+                        <div class="ui grey inverted header">
+                            <i class="tasks icon"></i>
+                            <div class="content">
+                                Gameplay
+                                <div class="sub header">Rules and Scoring</div>
+                            </div>
+                        </div>
+                        <div class="ui short scrolling segment">
+                            <div class="ui dividing header">A Brief Rundown</div>
+                            <p class="lead"><img class="ui tiny rounded right floated bordered image" title="Farkle rules"
+                                    src="https://cdn11.bigcommerce.com/s-70184/product_images/uploaded_images/farkle-rules-dice-game.gif"
+                                    alt="10,000 rules" />10,000 is a push-your-luck game in which the objective is to be
+                                the first player to accumulate 10,000 points. The play is passed
+                                back and forth as players attempt to gather point-scoring melds while evaluating if the
+                                risk of rolling a farkle and losing all unbanked points is worth the lure of getting
+                                just a few more points. As with many games Farkle is played in numerous regions with
+                                dozens of variations. The version we have here is among the simpler ones, and
+                                only includes the standard melds common to most variations we could find.
+                            </p>
+                            <div class="ui dividing header">Gameplay</div>
+                            <div class="ui sub header">Rolling, scoring, banking</div>
+                            <p>
+                                The game is played with six dice. A player starts their turn by throwing all six dice.
+                                Once the dice have been rolled the player may put aside any dice that form scoring melds
+                                (see melds below). A player must put aside at least one scoring die each
+                                throw, but beyond that is free in what dice they put aside or throw again.
+                            </p>
+                            <p>
+                                Players may now roll any remaining dice not already put aside in hopes of being able to
+                                make more melds, risking the chance of farkling (see below) and scoring nothing.
+                                Players who decide not to take that risk can instead bank. When a player banks any
+                                points earned during the round are added to the grand total and are safe for the
+                                rest of the game. The player's turn ends and they pass all dice to their opponent who
+                                takes their turn.
+                            </p>
+                            <h4 class="ui sub header">All dice in a meld must come from one throw</h4>
+                            <p>
+                                Melds do not carry over between throws. If you score two ones in one throw and set them
+                                aside throwing a one in the next throw does not mean you have three ones, it means
+                                you have a set of two ones worth 200, and a separate set of one worth 100 for a total of
+                                300. Any formed melds must contain dice obtained from a single throw.
+                            </p>
+
+                            <h4 class="ui sub header">Farkling</h4>
+                            <p>
+                                If there are no melds on the table after a player throws their dice they have "farkled".
+                                When a player farkles their turn is over, play passes to their opponent,
+                                and any unbanked points earned during the round are lost. With every throw the odds of
+                                farkling grow higher, and the player risks more and more points in the process.
+                                The key of the game comes in finding when you should risk the farkle and throw again,
+                                and when you should call it quits and bank your points.
+                            </p>
+                            <h4 class="ui sub header">Hot Dice</h4>
+                            <p>
+                                In the case a player can form melds from all the dice they threw they have thrown "Hot
+                                dice". Such a player can now, if they choose, pick up all six dice they have
+                                and throw them again, effectively restarting their turn. Any points they already earned
+                                before throwing the hot dice are kept as part of the accumulating round total
+                                and are risked along with any new melds made with the hot dice. A player can thus
+                                continue indefinitely as long as they never farkle.
+                            </p>
+                            <h3 class="ui sub header">Game End</h3>
+                            <p>
+                                The game ends once either player ends their turn with more than 10.000 points banked.
+                                The game doesn't automatically end your turn when you hypothetically reach the
+                                threshold,
+                                because we've found it to be more fun to manually bank for the win and in the cases were
+                                we want to see how far we can push our already sizable lead. However once you
+                                find that banking will lead to you winning we recommend doing so, unless you just want
+                                to show off to Bill.
+                            </p>
+
+                            <div class="ui dividing header">Melds</div>
+
+                            <p>
+                                The following are the melds that the game recognizes.
+                            </p>
+
+                            <ul>
+                                <li><b>Ones: </b>Any die depicting a one. Worth 100 points each.</li>
+                                <li><b>Fives: </b>Any die depicting a five. Worth 50 points each.</li>
+                                <li><b>Three Ones: </b>A set of three dice depicting a one. worth 1000 points</li>
+                                <li><b>Three Twos: </b>A set of three dice depicting a two. worth 200 points</li>
+                                <li><b>Three Threes: </b>A set of three dice depicting a three. worth 300 points</li>
+                                <li><b>Three Fours: </b>A set of three dice depicting a four. worth 400 points</li>
+                                <li><b>Three Fives: </b>A set of three dice depicting a five. worth 500 points</li>
+                                <li><b>Three Sixes: </b>A set of three dice depicting a six. worth 600 points</li>
+                                <li><b>Four of a kind: </b>Any set of four dice depicting the same value. Worth 1000
+                                    points </li>
+                                <li><b>Five of a kind: </b>Any set of five dice depicting the same value. Worth 2000
+                                    points </li>
+                                <li><b>Six of a kind: </b>Any set of six dice depicting the same value. Worth 3000
+                                    points </li>
+                                <li><b>Three Pairs: </b>Any three sets of two pairs of dice. Includes having a four of a
+                                    kind plus a pair. Worth 1500 points </li>
+                                <li><b>Run: </b>Six dice in a sequence (1,2,3,4,5,6). Worth 2500 points </li>
+
+
+                            </ul>
+                            <p>Here's a point scoring chart:</p>
+                            <table class="ui small collapsing blue striped celled single line table">
+                                <thead>
+                                    <tr>
+                                        <th>Roll</th>
+                                        <th class="right aligned">Points</th>
+                                        <th>Example</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Single "1"</td>
+                                        <td class="right aligned">100</td>
+                                        <td>
+                                            <i class="dice one icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Single "5"</td>
+                                        <td class="right aligned">50</td>
+                                        <td>
+                                            <i class="dice five icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Three 1's</td>
+                                        <td class="right aligned">300</td>
+                                        <td>
+                                            <i class="dice one icon"></i>
+                                            <i class="dice one icon"></i>
+                                            <i class="dice one icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Three 2's</td>
+                                        <td class="right aligned">200</td>
+                                        <td>
+                                            <i class="dice two icon"></i>
+                                            <i class="dice two icon"></i>
+                                            <i class="dice two icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Three 3's</td>
+                                        <td class="right aligned">300</td>
+                                        <td>
+                                            <i class="dice three icon"></i>
+                                            <i class="dice three icon"></i>
+                                            <i class="dice three icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Three 4's</td>
+                                        <td class="right aligned">400</td>
+                                        <td>
+                                            <i class="dice four icon"></i>
+                                            <i class="dice four icon"></i>
+                                            <i class="dice four icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Three 5's</td>
+                                        <td class="right aligned">500</td>
+                                        <td>
+                                            <i class="dice five icon"></i>
+                                            <i class="dice five icon"></i>
+                                            <i class="dice five icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Three 6's</td>
+                                        <td class="right aligned">600</td>
+                                        <td>
+                                            <i class="dice six icon"></i>
+                                            <i class="dice six icon"></i>
+                                            <i class="dice six icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Four of a Kind</td>
+                                        <td class="right aligned">1,000</td>
+                                        <td>
+                                            <i class="dice four icon"></i>
+                                            <i class="dice four icon"></i>
+                                            <i class="dice four icon"></i>
+                                            <i class="dice four icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Five of a Kind</td>
+                                        <td class="right aligned">2,000</td>
+                                        <td>
+                                            <i class="dice five icon"></i>
+                                            <i class="dice five icon"></i>
+                                            <i class="dice five icon"></i>
+                                            <i class="dice five icon"></i>
+                                            <i class="dice five icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Six of a Kind</td>
+                                        <td class="right aligned">10,000</td>
+                                        <td>
+                                            <i class="dice six icon"></i>
+                                            <i class="dice six icon"></i>
+                                            <i class="dice six icon"></i>
+                                            <i class="dice six icon"></i>
+                                            <i class="dice six icon"></i>
+                                            <i class="dice six icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Straight (1-2-3-4-5-6)</td>
+                                        <td class="right aligned">1,200</td>
+                                        <td>
+                                            <i class="dice one icon"></i>
+                                            <i class="dice two icon"></i>
+                                            <i class="dice three icon"></i>
+                                            <i class="dice four icon"></i>
+                                            <i class="dice five icon"></i>
+                                            <i class="dice six icon"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Three Pairs</td>
+                                        <td class="right aligned">750</td>
+                                        <td>
+                                            <i class="dice one icon"></i>
+                                            <i class="dice one icon"></i>
+                                            <i class="dice two icon"></i>
+                                            <i class="dice two icon"></i>
+                                            <i class="dice three icon"></i>
+                                            <i class="dice three icon"></i>
+                                        </td>
+                                    </tr>
+                                    </thead>
+                            </table>
+                            <p>One exception to this rule is that three 1’s rolled is 1,000 points rather than 100
+                                points.</p>
+                        </div>
+                        <button class="ui primary play button" data-tooltip="Start the game!"
+                        data-variation="tiny basic">Play</button>
+                        <button class="ui right floated primary back button" data-tooltip="Go back.."
+                        data-variation="tiny basic">Back</button>
+                    </div>
+                    <div class="ui simple medium dimmer"></div>
+                </div>
+            </section>
+
+            <div id="game">
+                <canvas id="game-area"></canvas>
+                <div class="ui hidden toast" id="toast-template">
+                    <div class="content">
+                        <div class="ui header"></div>
+                        <div class="message"></div>
+                    </div>
+                </div>
+                <div class="ui blue stacked fixed bottom sticky segement"
+                    style="margin-right: 1em; margin-bottom: 1em;">
+                    <div class="ui very relaxed horizontal right floated list">
+                        <div class="item">
+                            <div class="content">
+                                <div class="ui huge statistic">
+                                    <div id="current-score" class="value">
+                                        0
+                                    </div>
+                                    <div class="label">
+                                        Current Score
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="content">
+                                <div class="ui huge statistic">
+                                    <div id="bank-score" class="value">
+                                        0
+                                    </div>
+                                    <div class="label">
+                                        Banked Score
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui huge hidden section clearing divider"></div>
+                    <table id="score-table" class="ui blue celled short unstackable scrolling striped single line table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th class="center aligned">Holding</th>
+                                <th class="collapsed aligned">Action</th>
+                                <th class="collapsed right aligned">Current</th>
+                                <th class="collapsed right aligned">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table rows for each player's score will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        <button class="ui primary throw button" hidden>Throw</button>
+        <button class="ui primary bank disabled button" hidden>Bank</button>
+        <button class="ui primary score disabled button" hidden>Score</button>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+        <script>
+            const $rulesBtn = $('.rules.button');
+            const $backBtn = $('.back.button');
+            const $actionBtns = $('#action-buttons');
+            window.game = {};
+
+            // Game Common Functions
+            window.game.fn = {
+
+                getOptions: function (opts) {
+
+                    if (typeof (opts) == 'object') {
+
+                        return opts;
+
+                    } else if (typeof (opts) == 'string') {
+
+                        try {
+                            return JSON.parse(opts.replace(/'/g, '"').replace(';', ''));
+                        } catch (e) {
+                            return {};
+                        }
+
+                    } else {
+
+                        return {};
+
+                    }
+
+                },
+
+                execPluginFunction: function (functionName, context) {
+                    var args = Array.prototype.slice.call(arguments, 2);
+                    var namespaces = functionName.split(".");
+                    var func = namespaces.pop();
+
+                    for (var i = 0; i < namespaces.length; i++) {
+                        context = context[namespaces[i]];
+                    }
+
+                    return context[func].apply(context, args);
+                },
+
+                intObs: function (selector, functionName, intObsOptions, alwaysObserve) {
+                    var $el = document.querySelectorAll(selector);
+                    var intersectionObserverOptions = {
+                        rootMargin: '0px 0px 200px 0px'
+                    };
+
+                    if (Object.keys(intObsOptions).length) {
+                        intersectionObserverOptions = $.extend(intersectionObserverOptions, intObsOptions);
+                    }
+
+                    var observer = new IntersectionObserver(function (entries) {
+                        for (var i = 0; i < entries.length; i++) {
+                            var entry = entries[i];
+
+                            if (entry.intersectionRatio > 0) {
+                                if (typeof functionName === 'string') {
+                                    var func = Function('return ' + functionName)();
+                                } else {
+                                    var callback = functionName;
+
+                                    callback.call($(entry.target));
+                                }
+
+                                // Unobserve
+                                if (!alwaysObserve) {
+                                    observer.unobserve(entry.target);
+                                }
+
+                            }
+                        }
+                    }, intersectionObserverOptions);
+
+                    $($el).each(function () {
+                        observer.observe($(this)[0]);
+                    });
+                },
+
+                intObsInit: function (selector, functionName) {
+                    var $el = document.querySelectorAll(selector);
+                    var intersectionObserverOptions = {
+                        rootMargin: '200px'
+                    };
+
+                    var observer = new IntersectionObserver(function (entries) {
+                        for (var i = 0; i < entries.length; i++) {
+                            var entry = entries[i];
+                            if (entry.intersectionRatio > 0) {
+
+                                var $this = $(entry.target),
+                                    opts;
+
+                                var pluginOptions = game.fn.getOptions($this.data('plugin-options'));
+                                if (pluginOptions)
+                                    opts = pluginOptions;
+
+                                game.fn.execPluginFunction(functionName, $this, opts);
+
+                                // Unobserve
+                                observer.unobserve(entry.target);
+                            }
+                        }
+                    }, intersectionObserverOptions);
+
+                    $($el).each(function () {
+                        observer.observe($(this)[0]);
+                    });
+                },
+
+                dynIntObsInit: function (selector, functionName, pluginDefaults) {
+                    var $el = document.querySelectorAll(selector);
+
+                    $($el).each(function () {
+                        var $this = $(this),
+                            opts;
+
+                        var pluginOptions = game.fn.getOptions($this.data('plugin-options'));
+                        if (pluginOptions)
+                            opts = pluginOptions;
+
+                        var mergedPluginDefaults = game.fn.mergeOptions(pluginDefaults, opts);
+
+                        var intersectionObserverOptions = {
+                            rootMargin: game.fn.getRootMargin(functionName, mergedPluginDefaults),
+                            threshold: 0
+                        };
+
+                        if (!mergedPluginDefaults.forceInit) {
+
+                            var observer = new IntersectionObserver(function (entries) {
+                                for (var i = 0; i < entries.length; i++) {
+                                    var entry = entries[i];
+
+                                    if (entry.intersectionRatio > 0) {
+                                        game.fn.execPluginFunction(functionName, $this, mergedPluginDefaults);
+
+                                        // Unobserve
+                                        observer.unobserve(entry.target);
+                                    }
+                                }
+                            }, intersectionObserverOptions);
+
+                            observer.observe($this[0]);
+
+                        } else {
+                            game.fn.execPluginFunction(functionName, $this, mergedPluginDefaults);
+                        }
+                    });
+                },
+
+                mergeOptions: function (obj1, obj2) {
+                    var obj3 = {};
+
+                    for (var attrname in obj1) {
+                        obj3[attrname] = obj1[attrname];
+                    }
+                    for (var attrname in obj2) {
+                        obj3[attrname] = obj2[attrname];
+                    }
+
+                    return obj3;
+                },
+
+                execOnceTroughEvent: function ($el, event, callback) {
+                    var self = this,
+                        dataName = self.formatDataName(event);
+
+                    $($el).on(event, function () {
+                        if (!$(this).data(dataName)) {
+
+                            // Exec Callback Function
+                            callback.call($(this));
+
+                            // Add data name 
+                            $(this).data(dataName, true);
+
+                            // Unbind event
+                            $(this).off(event);
+                        }
+                    });
+
+                    return this;
+                },
+
+                execOnceTroughWindowEvent: function ($el, event, callback) {
+                    var self = this,
+                        dataName = self.formatDataName(event);
+
+                    $($el).on(event, function () {
+                        if (!$(this).data(dataName)) {
+
+                            // Exec Callback Function
+                            callback();
+
+                            // Add data name 
+                            $(this).data(dataName, true);
+
+                            // Unbind event
+                            $(this).off(event);
+                        }
+                    });
+
+                    return this;
+                },
+
+                formatDataName: function (name) {
+                    name = name.replace('.', '');
+                    return name;
+                },
+
+                isElementInView: function ($el) {
+                    var rect = $el[0].getBoundingClientRect();
+
+                    return (
+                        rect.top <= (window.innerHeight / 3)
+                    );
+                },
+
+                getScripts: function (arr, path) {
+                    var _arr = $.map(arr, function (scr) {
+                        return $.getScript((path || "") + scr);
+                    });
+
+                    _arr.push($.Deferred(function (deferred) {
+                        $(deferred.resolve);
+                    }));
+
+                    return $.when.apply($, _arr);
+                },
+
+                showMessage: function (title, content) {
+
+                    $('#modalGameMessage').remove();
+                    $('body').append(`<div id="modalGameMessage" class="ui small modal"><i class="close icon"></i><div class="center aligned header"></div><div class="center aligned content"><div class="description"></div></div><div class="center aligned actions"><div class="ui primary button">Close</div></div></div>`);
+
+                    $('#modalGameMessage').modal({
+                        title: title,
+                        content: content,
+                        classTitle: 'centered',
+                        classContent: 'centered',
+                        classActions: 'centered',
+                        class: 'small'
+                    }).modal('show');
+
+                }
+
+            };
+            (function (game, $) {
+
+                'use strict';
+
+                game = game || {};
+
+                // Default
+                var loadingOverlayDefaultTemplate = [
+                    '<div class="loading-overlay">',
+                    '<div class="bounce-loader"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>',
+                    '</div>'
+                ].join('');
+
+                // Percentage
+                var loadingOverlayPercentageTemplate = [
+                    '<div class="loading-overlay loading-overlay-percentage">',
+                    '<div class="page-loader-progress-wrapper"><span class="page-loader-progress">0</span><span class="page-loader-progress-symbol">%</span></div>',
+                    '</div>'
+                ].join('');
+
+                // Cubes
+                var loadingOverlayCubesTemplate = [
+                    '<div class="loading-overlay">',
+                    '<div class="bounce-loader"><div class="cssload-thecube"><div class="cssload-cube cssload-c1"></div><div class="cssload-cube cssload-c2"></div><div class="cssload-cube cssload-c4"></div><div class="cssload-cube cssload-c3"></div></div></div>',
+                    '</div>'
+                ].join('');
+
+                // Cube Progress
+                var loadingOverlayCubeProgressTemplate = [
+                    '<div class="loading-overlay">',
+                    '<div class="bounce-loader"><span class="cssload-cube-progress"><span class="cssload-cube-progress-inner"></span></span></div>',
+                    '</div>'
+                ].join('');
+
+                // Float Rings
+                var loadingOverlayFloatRingsTemplate = [
+                    '<div class="loading-overlay">',
+                    '<div class="bounce-loader"><div class="cssload-float-rings-loader"><div class="cssload-float-rings-inner cssload-one"></div><div class="cssload-float-rings-inner cssload-two"></div><div class="cssload-float-rings-inner cssload-three"></div></div></div>',
+                    '</div>'
+                ].join('');
+
+                // Floating Bars
+                var loadingOverlayFloatBarsTemplate = [
+                    '<div class="loading-overlay">',
+                    '<div class="bounce-loader"><div class="cssload-float-bars-container"><ul class="cssload-float-bars-flex-container"><li><span class="cssload-float-bars-loading"></span></li></div></div></div>',
+                    '</div>'
+                ].join('');
+
+                // Speeding Wheel
+                var loadingOverlaySpeedingWheelTemplate = [
+                    '<div class="loading-overlay">',
+                    '<div class="bounce-loader"><div class="cssload-speeding-wheel-container"><div class="cssload-speeding-wheel"></div></div></div>',
+                    '</div>'
+                ].join('');
+
+                // Zenith
+                var loadingOverlayZenithTemplate = [
+                    '<div class="loading-overlay">',
+                    '<div class="bounce-loader"><div class="cssload-zenith-container"><div class="cssload-zenith"></div></div></div>',
+                    '</div>'
+                ].join('');
+
+                // Spinning Square
+                var loadingOverlaySpinningSquareTemplate = [
+                    '<div class="loading-overlay">',
+                    '<div class="bounce-loader"><div class="cssload-spinning-square-loading"></div></div>',
+                    '</div>'
+                ].join('');
+
+                // Pulse
+                var loadingOverlayPulseTemplate = [
+                    '<div class="loading-overlay">',
+                    '<div class="bounce-loader"><div class="wrapper-pulse"><div class="cssload-pulse-loader"></div></div></div>',
+                    '</div>'
+                ].join('');
+
+                var LoadingOverlay = function ($wrapper, options, noInheritOptions) {
+                    return this.initialize($wrapper, options, noInheritOptions);
+                };
+
+                LoadingOverlay.prototype = {
+
+                    options: {
+                        css: {},
+                        hideDelay: 500,
+                        progressMinTimeout: 0,
+                        effect: 'default'
+                    },
+
+                    initialize: function ($wrapper, options, noInheritOptions) {
+                        this.$wrapper = $wrapper;
+
+                        this
+                            .setVars()
+                            .setOptions(options, noInheritOptions)
+                            .build()
+                            .events()
+                            .dynamicShowHideEvents();
+
+                        this.$wrapper.data('loadingOverlay', this);
+                    },
+
+                    setVars: function () {
+                        this.$overlay = this.$wrapper.find('.loading-overlay');
+                        this.pageStatus = null;
+                        this.progress = null;
+                        this.animationInterval = 33;
+
+                        return this;
+                    },
+
+                    setOptions: function (options, noInheritOptions) {
+                        if (!this.$overlay.get(0)) {
+                            this.matchProperties();
+                        }
+
+                        if (noInheritOptions) {
+                            this.options = $.extend(true, {}, this.options, options);
+                        } else {
+                            this.options = $.extend(true, {}, this.options, options, window.game.fn.getOptions(this.$wrapper.data('plugin-options')));
+                        }
+
+                        this.loaderClass = this.getLoaderClass(this.options.css.backgroundColor);
+
+                        return this;
+                    },
+
+                    build: function () {
+                        var _self = this;
+
+                        if (!this.$overlay.closest(document.documentElement).get(0)) {
+                            if (!this.$cachedOverlay) {
+
+                                switch (_self.options.effect) {
+                                    case 'percentageProgress1':
+                                        this.$overlay = $(loadingOverlayPercentageTemplate).clone();
+                                        break;
+
+                                    case 'percentageProgress2':
+                                        this.$overlay = $(loadingOverlayPercentageTemplate).clone();
+                                        this.$overlay
+                                            .addClass('loading-overlay-percentage-effect-2')
+                                            .prepend('<div class="loading-overlay-background-layer"></div>');
+                                        break;
+
+                                    case 'cubes':
+                                        this.$overlay = $(loadingOverlayCubesTemplate).clone();
+                                        break;
+
+                                    case 'cubeProgress':
+                                        this.$overlay = $(loadingOverlayCubeProgressTemplate).clone();
+                                        break;
+
+                                    case 'floatRings':
+                                        this.$overlay = $(loadingOverlayFloatRingsTemplate).clone();
+                                        break;
+
+                                    case 'floatBars':
+                                        this.$overlay = $(loadingOverlayFloatBarsTemplate).clone();
+                                        break;
+
+                                    case 'speedingWheel':
+                                        this.$overlay = $(loadingOverlaySpeedingWheelTemplate).clone();
+                                        break;
+
+                                    case 'zenith':
+                                        this.$overlay = $(loadingOverlayZenithTemplate).clone();
+                                        break;
+
+                                    case 'spinningSquare':
+                                        this.$overlay = $(loadingOverlaySpinningSquareTemplate).clone();
+                                        break;
+
+                                    case 'pulse':
+                                        this.$overlay = $(loadingOverlayPulseTemplate).clone();
+                                        break;
+
+                                    case 'default':
+                                    default:
+                                        this.$overlay = $(loadingOverlayDefaultTemplate).clone();
+                                        break;
+                                }
+
+                                if (this.options.css) {
+                                    this.$overlay.css(this.options.css);
+                                    this.$overlay.find('.loader').addClass(this.loaderClass);
+                                }
+                            } else {
+                                this.$overlay = this.$cachedOverlay.clone();
+                            }
+
+                            this.$wrapper.prepend(this.$overlay);
+                        }
+
+                        if (!this.$cachedOverlay) {
+                            this.$cachedOverlay = this.$overlay.clone();
+                        }
+
+                        if (['percentageProgress1', 'percentageProgress2'].includes(_self.options.effect)) {
+                            _self.updateProgress();
+
+                            if (_self.options.isDynamicHideShow) {
+                                setTimeout(function () {
+                                    _self.progress = 'complete';
+
+                                    $('.page-loader-progress').text(100);
+
+                                    if (['percentageProgress2'].includes(_self.options.effect)) {
+                                        $('.loading-overlay-background-layer').css({
+                                            width: '100%'
+                                        });
+                                    }
+                                }, 2800);
+                            }
+                        }
+
+                        return this;
+                    },
+
+                    events: function () {
+                        var _self = this;
+
+                        if (this.options.startShowing) {
+                            _self.show();
+                        }
+
+                        if (this.$wrapper.is('body') || this.options.hideOnWindowLoad) {
+                            $(window).on('load error', function () {
+                                setTimeout(function () {
+                                    _self.hide();
+                                }, _self.options.progressMinTimeout);
+                            });
+                        }
+
+                        if (this.options.listenOn) {
+                            $(this.options.listenOn)
+                                .on('loading-overlay:show beforeSend.ic', function (e) {
+                                    e.stopPropagation();
+                                    _self.show();
+                                })
+                                .on('loading-overlay:hide complete.ic', function (e) {
+                                    e.stopPropagation();
+                                    _self.hide();
+                                });
+                        }
+
+                        this.$wrapper
+                            .on('loading-overlay:show beforeSend.ic', function (e) {
+                                if (e.target === _self.$wrapper.get(0)) {
+                                    e.stopPropagation();
+                                    _self.show();
+                                    return true;
+                                }
+                                return false;
+                            })
+                            .on('loading-overlay:hide complete.ic', function (e) {
+                                if (e.target === _self.$wrapper.get(0)) {
+                                    e.stopPropagation();
+                                    _self.hide();
+                                    return true;
+                                }
+                                return false;
+                            });
+
+                        if (['percentageProgress1', 'percentageProgress2'].includes(_self.options.effect)) {
+                            $(window).on('load', function () {
+                                setTimeout(function () {
+                                    _self.pageStatus = "complete";
+
+                                    $('.page-loader-progress').text(100);
+
+                                    if (['percentageProgress2'].includes(_self.options.effect)) {
+                                        $('.loading-overlay-background-layer').css({
+                                            width: '100%'
+                                        });
+                                    }
+                                }, _self.options.progressMinTimeout);
+                            });
+                        }
+
+                        return this;
+                    },
+
+                    show: function () {
+                        this.build();
+
+                        this.position = this.$wrapper.css('position').toLowerCase();
+                        if (this.position != 'relative' || this.position != 'absolute' || this.position != 'fixed') {
+                            this.$wrapper.css({
+                                position: 'relative'
+                            });
+                        }
+                        this.$wrapper.addClass('loading-overlay-showing');
+                    },
+
+                    hide: function () {
+                        var _self = this;
+
+                        setTimeout(function () {
+                            _self.$wrapper.removeClass('loading-overlay-showing');
+
+                            if (this.position != 'relative' || this.position != 'absolute' || this.position != 'fixed') {
+                                _self.$wrapper.css({position: ''});
+                            }
+
+                            $(window).trigger('loading.overlay.ready');
+                        }, _self.options.hideDelay);
+                    },
+
+                    updateProgress: function () {
+                        var _self = this;
+
+                        var render = function () {
+                            if (_self.pageStatus == "complete") {
+                                $('.page-loader-progress').text(100);
+                                setTimeout(function () {
+                                    $('.page-loader-progress').addClass('d-none');
+                                }, 700);
+                            }
+                            else {
+                                if (_self.progress == null) {
+                                    _self.progress = 1;
+                                }
+
+                                _self.progress = _self.progress + 1;
+                                if (_self.progress >= 0 && _self.progress <= 30) {
+                                    _self.animationInterval += 1;
+                                    $('.page-loader-progress').text(_self.progress);
+                                }
+                                else if (_self.progress > 30 && _self.progress <= 60) {
+                                    _self.animationInterval += 2;
+                                    $('.page-loader-progress').text(_self.progress);
+                                }
+                                else if (_self.progress > 60 && _self.progress <= 80) {
+                                    _self.animationInterval += 40;
+                                    $('.page-loader-progress').text(_self.progress);
+                                }
+                                else if (_self.progress > 80 && _self.progress <= 90) {
+                                    _self.animationInterval += 80;
+                                    $('.page-loader-progress').text(_self.progress);
+                                }
+                                else if (_self.progress > 90 && _self.progress <= 95) {
+                                    _self.animationInterval += 150;
+                                    $('.page-loader-progress').text(_self.progress);
+                                }
+                                else if (_self.progress > 95 && _self.progress <= 99) {
+                                    _self.animationInterval += 400;
+                                    $('.page-loader-progress').text(_self.progress);
+                                }
+                                else if (_self.progress >= 100) {
+                                    $('.page-loader-progress').text(99);
+                                }
+
+                                if (['percentageProgress2'].includes(_self.options.effect)) {
+                                    $('.loading-overlay-background-layer').css({
+                                        width: _self.progress + '%'
+                                    });
+                                }
+
+                                self.loopInside = setTimeout(render, _self.animationInterval);
+                            }
+
+                        };
+                        render();
+
+                        return this;
+                    },
+
+                    matchProperties: function () {
+                        var i,
+                            l,
+                            properties;
+
+                        properties = [
+                            'backgroundColor',
+                            'borderRadius'
+                        ];
+
+                        l = properties.length;
+
+                        for (i = 0; i < l; i++) {
+                            var obj = {};
+                            obj[properties[i]] = this.$wrapper.css(properties[i]);
+
+                            $.extend(this.options.css, obj);
+                        }
+                    },
+
+                    getLoaderClass: function (backgroundColor) {
+                        if (!backgroundColor || backgroundColor === 'transparent' || backgroundColor === 'inherit') {
+                            return 'black';
+                        }
+
+                        var hexColor,
+                            r,
+                            g,
+                            b,
+                            yiq;
+
+                        var colorToHex = function (color) {
+                            var hex,
+                                rgb;
+
+                            if (color.indexOf('#') > - 1) {
+                                hex = color.replace('#', '');
+                            } else {
+                                rgb = color.match(/\d+/g);
+                                hex = ('0' + parseInt(rgb[0], 10).toString(16)).slice(-2) + ('0' + parseInt(rgb[1], 10).toString(16)).slice(-2) + ('0' + parseInt(rgb[2], 10).toString(16)).slice(-2);
+                            }
+
+                            if (hex.length === 3) {
+                                hex = hex + hex;
+                            }
+
+                            return hex;
+                        };
+
+                        hexColor = colorToHex(backgroundColor);
+
+                        r = parseInt(hexColor.substr(0, 2), 16);
+                        g = parseInt(hexColor.substr(2, 2), 16);
+                        b = parseInt(hexColor.substr(4, 2), 16);
+                        yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+
+                        return (yiq >= 128) ? 'black' : 'white';
+                    },
+
+                    dynamicShowHide: function (effect) {
+                        var _self = this;
+
+                        // Remove Loading Overlay Data
+                        $('body').removeData('loadingOverlay');
+
+                        // Remove Html Of Loading Overlay
+                        $('.loading-overlay').remove();
+
+                        if (effect == '') {
+                            return this;
+                        }
+
+                        // Initialize New Loading Overlay (second parameter is to NO inherit data-plugin-options)
+                        $('body').loadingOverlay({
+                            effect: effect ? effect : 'pulse',
+                            isDynamicHideShow: true
+                        }, true);
+
+                        // Show Loading Overlay Loader
+                        $('body').data('loadingOverlay').show();
+
+                        // Hide Loading Overlay Loader
+                        setTimeout(function () {
+                            $('body').data('loadingOverlay').hide();
+                        }, 3000);
+
+                        return this;
+                    },
+
+                    dynamicShowHideEvents: function () {
+                        var _self = this;
+
+                        // Button
+                        $(document).off('click.loading-overlay-button').on('click.loading-overlay-button', '.loading-overlay-button', function (e) {
+                            e.preventDefault();
+
+                            _self.dynamicShowHide($(this).data('effect'));
+                        });
+
+                        // Select
+                        $(document).off('change.loading-overlay-select').on('change.loading-overlay-select', '.loading-overlay-select', function () {
+                            _self.dynamicShowHide($(this).val());
+                        });
+
+                        return this;
+                    }
+
+                };
+
+                // expose to scope
+                $.extend(game, {
+                    LoadingOverlay: LoadingOverlay
+                });
+
+                // expose as a jquery plugin
+                $.fn.loadingOverlay = function (opts, noInheritOptions) {
+                    return this.each(function () {
+                        var $this = $(this);
+
+                        var loadingOverlay = $this.data('loadingOverlay');
+                        if (loadingOverlay) {
+                            return loadingOverlay;
+                        } else {
+                            var options = opts || $this.data('loading-overlay-options') || {};
+                            return new LoadingOverlay($this, options, noInheritOptions);
+                        }
+                    });
+                };
+
+                // auto init
+                $('[data-loading-overlay]').loadingOverlay();
+
+            }).apply(this, [window.theme, jQuery]);
+
+            (function( $ ) {
+
+                'use strict';
+
+                particlesJS("welcome-particles", {
+                    "particles": {
+                        "number": {
+                            "value": 160,
+                            "density": {
+                                "enable": true,
+                                "value_area": 800
+                            }
+                        },
+                        "color": {
+                            "value": "#0088cc"
+                        },
+                        "shape": {
+                            "type": "circle",
+                            "stroke": {
+                                "width": 0,
+                                "color": "#000000"
+                            },
+                            "polygon": {
+                                "nb_sides": 5
+                            }
+                        },
+                        "opacity": {
+                            "value": 1,
+                            "random": true,
+                            "anim": {
+                                "enable": true,
+                                "speed": 1,
+                                "opacity_min": 0,
+                                "sync": false
+                            }
+                        },
+                        "size": {
+                            "value": 3,
+                            "random": true,
+                            "anim": {
+                                "enable": false,
+                                "speed": 4,
+                                "size_min": 0.3,
+                                "sync": false
+                            }
+                        },
+                        "line_linked": {
+                            "enable": false,
+                            "distance": 150,
+                            "color": "#0088cc",
+                            "opacity": 0.4,
+                            "width": 1
+                        },
+                        "move": {
+                            "enable": true,
+                            "speed": 1,
+                            "direction": "none",
+                            "random": true,
+                            "straight": false,
+                            "out_mode": "out",
+                            "bounce": false,
+                            "attract": {
+                                "enable": false,
+                                "rotateX": 600,
+                                "rotateY": 600
+                            }
+                        }
+                    },
+                    "interactivity": {
+                        "detect_on": "canvas",
+                        "events": {
+                            "onhover": {
+                                "enable": true,
+                                "mode": "bubble"
+                            },
+                            "onclick": {
+                                "enable": true,
+                                "mode": "repulse"
+                            },
+                            "resize": true
+                        },
+                        "modes": {
+                            "grab": {
+                                "distance": 400,
+                                "line_linked": {
+                                    "opacity": 1
+                                }
+                            },
+                            "bubble": {
+                                "distance": 250,
+                                "size": 0,
+                                "duration": 2,
+                                "opacity": 0,
+                                "speed": 3
+                            },
+                            "repulse": {
+                                "distance": 400,
+                                "duration": 0.4
+                            },
+                            "push": {
+                                "particles_nb": 4
+                            },
+                            "remove": {
+                                "particles_nb": 2
+                            }
+                        }
+                    },
+                    "retina_detect": true
+                });
+
+                particlesJS("rules-particles", {
+                    "particles": {
+                        "number": {
+                            "value": 160,
+                            "density": {
+                                "enable": true,
+                                "value_area": 800
+                            }
+                        },
+                        "color": {
+                            "value": "#0088cc"
+                        },
+                        "shape": {
+                            "type": "circle",
+                            "stroke": {
+                                "width": 0,
+                                "color": "#000000"
+                            },
+                            "polygon": {
+                                "nb_sides": 5
+                            }
+                        },
+                        "opacity": {
+                            "value": 1,
+                            "random": true,
+                            "anim": {
+                                "enable": true,
+                                "speed": 1,
+                                "opacity_min": 0,
+                                "sync": false
+                            }
+                        },
+                        "size": {
+                            "value": 3,
+                            "random": true,
+                            "anim": {
+                                "enable": false,
+                                "speed": 4,
+                                "size_min": 0.3,
+                                "sync": false
+                            }
+                        },
+                        "line_linked": {
+                            "enable": false,
+                            "distance": 150,
+                            "color": "#0088cc",
+                            "opacity": 0.4,
+                            "width": 1
+                        },
+                        "move": {
+                            "enable": true,
+                            "speed": 1,
+                            "direction": "none",
+                            "random": true,
+                            "straight": false,
+                            "out_mode": "out",
+                            "bounce": false,
+                            "attract": {
+                                "enable": false,
+                                "rotateX": 600,
+                                "rotateY": 600
+                            }
+                        }
+                    },
+                    "interactivity": {
+                        "detect_on": "canvas",
+                        "events": {
+                            "onhover": {
+                                "enable": true,
+                                "mode": "bubble"
+                            },
+                            "onclick": {
+                                "enable": true,
+                                "mode": "repulse"
+                            },
+                            "resize": true
+                        },
+                        "modes": {
+                            "grab": {
+                                "distance": 400,
+                                "line_linked": {
+                                    "opacity": 1
+                                }
+                            },
+                            "bubble": {
+                                "distance": 250,
+                                "size": 0,
+                                "duration": 2,
+                                "opacity": 0,
+                                "speed": 3
+                            },
+                            "repulse": {
+                                "distance": 400,
+                                "duration": 0.4
+                            },
+                            "push": {
+                                "particles_nb": 4
+                            },
+                            "remove": {
+                                "particles_nb": 2
+                            }
+                        }
+                    },
+                    "retina_detect": true
+                });
+
+                }).apply( this, [ jQuery ]);
+        </script>
+    </body>
+
+</html>
