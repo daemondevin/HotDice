@@ -1,3 +1,147 @@
+function calculateRollScore(dice) {
+  let diceCounts = [0, 0, 0, 0, 0, 0];
+  for (var i = 0; i < dice.length; i++) {
+    if (dice[i].avalible === false) {
+      diceCounts[dice[i].value - 1]++;
+    }
+  }
+
+  var score = 0;
+
+  // Check for individual 1s and 5s
+  score += diceCounts[0] >= 3 ? 1000 : diceCounts[0] * 100; // Three 1s are worth 1000 points, individual 1s are worth 100 points each
+  score += diceCounts[4] >= 3 ? 500 : diceCounts[4] * 50; // Three 5s are worth 500 points, individual 5s are worth 50 points each
+
+  // Check for three of a kind
+  for (var j = 1; j <= 5; j++) {
+    if (diceCounts[j] >= 3) {
+      score += (j + 1) * 100; // Three of any number (except 1) are worth 100 times the number
+    }
+  }
+
+  // Check for special combinations
+  if (
+    diceCounts[0] >= 1 &&
+    diceCounts[1] >= 1 &&
+    diceCounts[2] >= 1 &&
+    diceCounts[3] >= 1 &&
+    diceCounts[4] >= 1 &&
+    diceCounts[5] >= 1
+  ) {
+    score += 3000; // 1-2-3-4-5-6 combination is worth 3000 points
+  }
+
+  if (
+    diceCounts.filter(function (count) {
+      return count === 2;
+    }).length === 3
+  ) {
+    score += 1500; // Three pairs (including 4-of-a-kind and a pair) are worth 1500 points
+  }
+  return score;
+}
+
+function calculateScore() {
+	tempScore = 0;
+	var ones = [];
+	var twos = [];
+	var threes = [];
+	var fours = [];
+	var fives = [];
+	var sixes = [];
+	var scoreArray = [];
+	for (var i = 0; i < this.dice.length; i++) {							//test out totals, etc.
+		if (this.dice[i].available === false) {
+			switch (this.dice[i].value) {
+				case 1: ones.push(1);
+								break;
+				case 2: twos.push(2);
+								break;
+				case 3: threes.push(3);
+								break;
+				case 4: fours.push(4);
+								break;
+				case 5: fives.push(5);
+								break;
+				case 6: sixes.push(6);
+								break;
+			}
+		}
+	}
+	switch (ones.length) {
+		case 1: scoreArray[0] = 100; break;
+		case 2: scoreArray[0] = 200; break;
+		case 3: scoreArray[0] = 1000; break;
+		case 4: scoreArray[0] = 2000; break;
+		case 5: scoreArray[0] = 3000; break;
+		case 6: scoreArray[0] = 4000; break;
+		default: scoreArray[0] = 0;
+	}
+	switch (twos.length) {
+		case 3: scoreArray[1] = 200; break;
+		case 4: scoreArray[1] = 400; break;
+		case 5: scoreArray[1] = 600; break;
+		case 6: scoreArray[1] = 800; break;
+		default: scoreArray[1] = 0;
+	}
+	switch (threes.length) {
+		case 3: scoreArray[2] = 300; break;
+		case 4: scoreArray[2] = 600; break;
+		case 5: scoreArray[2] = 900; break;
+		case 6: scoreArray[2] = 1200; break;
+		default: scoreArray[2] = 0;
+	}
+	switch (fours.length) {
+		case 3: scoreArray[3] = 400; break;
+		case 4: scoreArray[3] = 800; break;
+		case 5: scoreArray[3] = 1200; break;
+		case 6: scoreArray[3] = 1600; break;
+		default: scoreArray[3] = 0;
+	}
+	switch (fives.length) {
+		case 1: scoreArray[4] = 50; break;
+		case 2: scoreArray[4] = 100; break;
+		case 3: scoreArray[4] = 500; break;
+		case 4: scoreArray[4] = 1000; break;
+		case 5: scoreArray[4] = 1500; break;
+		case 6: scoreArray[4] = 2000; break;
+		default: scoreArray[4] = 0;
+	}
+	switch (sixes.length) {
+		case 3: scoreArray[5] = 600; break;
+		case 4: scoreArray[5] = 1200; break;
+		case 5: scoreArray[5] = 1800; break;
+		case 6: scoreArray[5] = 2400; break;
+		default: scoreArray[5] = 0;
+	}
+	return scoreArray[0] + scoreArray[1] + scoreArray[2] + scoreArray[3] + scoreArray[4] + scoreArray[5];
+}
+
+function hotDice(dice) {
+	var counter = 0;
+	for (var i = 0; i < 6; i++) {
+		if (diceArray[i].available === false) {
+			counter++;
+		}
+	}
+	if (counter === 6 && tempScore !== 0) {
+		$("#instructions").text("You have Hot Dice! Keep rolling or bank your score.");
+		youHaveHotDice = true;
+	}
+}	
+
+function addCommas(nStr) {
+	nStr += '';
+	x = nStr.split('.');
+	x1 = x[0];
+	x2 = x.length > 1 ? '.' + x[1] : '';
+	var rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+		x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	}
+	return x1 + x2;
+}
+
 function ofakind(eval, arr) {
     for (let i = 1; i < 7; i++) {
         if (
@@ -110,40 +254,59 @@ function game() {
     this.messages = [];
     this.started = false;
     this.turnindex = 0;
+    this.die = 0;
     this.firstconnection = false;
-    this.selected = { quantity: 0, values: [] };
-    this.playerScore = { bank: 0, current: 0 };
     this.turn = {
         roll_count: 0,
+        tempscore: 0,
         score: 0,
     };
     this.scoreToWin = 10000;
 
-    this.dice = new Array(6).fill({
-        value: 0,
-        avalible: true,
-    }, 0, 6);
+    this.dice = function() {
+        let dice = [];
+        for (i = 0; i < 6; i++) {	
+            dice[i] = {};						
+            dice[i].id = i;
+            dice[i].value = 0;
+            dice[i].available = true;
+        }
+        return dice;
+    }
 
     this.diceindex = [];
 
     this.nextturn = function nextturn() {
         this.turnindex = (this.turnindex + 1) % this.players.length;
-        this.dice.fill({
-            value: null,
-            avalible: true,
-        }, 0, 6);
+        for (i = 0; i < 6; i++) {	
+            this.dice[i] = {};						
+            this.dice[i].id = i;
+            this.dice[i].value = null;
+            this.dice[i].available = true;
+        }
         this.turn.roll_count = 0;
         this.turn.score = 0;
     };
 
-    this.roll = function (index) {
-        console.log("Dice Index: ", index);
+    
+    this.calculateRoll = function (index) {
+        let calculateDice = [];
         for (let i = 0; i < index.length; i++) {
-            this.dice[index[i]] = {
-                value: Math.floor(Math.random() * 6 + 1),
-                avalible: this.dice[index[i]].avalible,
-            };
+            calculateDice.push(this.dice[index[i]]);
         }
+        return calculateRollScore(calculateDice);
+    }
+
+    this.roll = function (index) {
+        console.log("Dice index: ", index);
+        this.dice = index;
+        /*for (let i = 0; i < index.length; i++) {
+            this.dice[i] = {
+                id: i,
+                value: Math.floor(Math.random() * 6 + 1),
+                avalible: this.dice[i].avalible,
+            };
+        }*/
         var scoreddice = [];
         //set all the dice not in the index to unavalible
         //use DiceHeld to determine if a dice was selected to be held per the rules of Farkle
@@ -162,11 +325,7 @@ function game() {
         if (!DiceHeld && this.turn.roll_count > 0) {
             return false;
         }
-        if (!this.hasfarkle) {
-            
-        }
-
-        this.turn.score += Score(scoreddice, 0);
+        this.turn.score += calculateRollScore(scoreddice);
 
         if (
             Score(

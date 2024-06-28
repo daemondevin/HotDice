@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Farkle</title>
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/fomantic-ui@2.9.3/dist/semantic.min.css" />
+        <link rel="stylesheet" type="text/css" href="farkle.css" />
+        <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+        <script type="importmap">
+          {
+            "imports": {
+                "three": "https://unpkg.com/three@0.138.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.138.0/examples/jsm/",
+                "cannon-es": "https://cdn.skypack.dev/cannon-es"
+            }
+          }
+        </script>
+        <script src="https://unpkg.com/jquery@3.7.1/dist/jquery.js"></script>
+        <script src="https://unpkg.com/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
+        <script type="module">
+            import * as CANNON from 'cannon-es';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls'
+import { OBJLoader } from 'three/addons/loaders/OBJLoader';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader';
+
+const canvasEl = document.querySelector('#canvas');
+
+const $canvasEl = $('#canvas');
+const $rollBtn = $('#roll-btn');
+const $bankBtn = $('#bank-btn');
+const $scoreBtn = $('#score-btn');
+
+let renderer, scene, camera, physicsWorld, raycaster, controls;
+
+// Assuming you have an array of player scores
+var playerScores = [];
+const playerScore = { bank: 0, current: 0 };
+playerScores[0] = {player: 'P0', score: [], bank: 0, current: 0};
+
+var isGameStarted = false;
+
+var currentPlayer = 0;
+var nbrPlayers = 0;
+
+// Retrieve the table element
+const table = document.getElementById('score-table');
+const $table = $('#score-table');
+// Get the table body element
+const tbody = table.getElementsByTagName('tbody')[0];
+const $tbody = $table.find('tbody');
+// Get the rows
+var rows = tbody.getElementsByTagName('tr');
+let $rows = $tbody.find('tr');
+let $playerRow = null;
+
+const params = {
+    numberOfDice: 6,
+    segments: 30,
+    edgeRadius: .07,
+    notchRadius: .12,
+    notchDepth: .1,
+};
+
+const diceArray = [];
+
+const pointer = new THREE.Vector2();
+
+var isStable = false;
+var stableCnt = 0;
+
+$canvasEl.on('mousedown', onMouseDown);
+
+raycaster = new THREE.Raycaster();
+
+initPhysics();
+initScene();
+
+window.addEventListener('resize', updateSceneSize);
+$rollBtn.on('click', throwDice);
+$bankBtn.on('click', nextPlayer);
+
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+/////////////////////  UI  /////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+
+const menuContainer = document.querySelector('#welcome');
+const contentContainer = document.querySelector('#game');
+const playerInput = document.getElementById('player-input');
+const $playerInput = $('#player-input');
+const $resumeBtn = $('#resume-btn');
+const $returnBtn = $('#return-btn');
+
+$('#players')
+  .dropdown({
+    placeholder: 'two'
+  })
+;
+$('#game').hide();
+$('#play-btn').on('click', function() {
+    const numPlayers = parseInt($playerInput.val());
+
+    if (numPlayers >= 1 && numPlayers <= 7) {
+        //menuContainer.classList.add('hidden');
+        $('#welcome').hide();
+        //contentContainer.classList.remove('hidden');
+        $('#game').show();
+        initializeGame(numPlayers); // Call the game initialization function with the number of players
+    } else {
+        console.log("Issue with number of players");
+        //alert('Please enter a number between 1 and 7 for the number of players.');
+    }
+});
+$resumeBtn.on('click', function () {
+    $('#welcome').hide();
+    $('#game').show();
+});
+
+$returnBtn.on('click', function() {
+    console.log("Return button");
+        $('#welcome').show();
+        $('#game').hide();
+    // Additional logic to reset the game if needed
+});
+
+$bankBtn.on("click", function () {
+    playerScore.bank += playerScore.current;
+    playerScore.current = 0;
+
+    $("img.dice").remove();
+
+    verify_winner();
+    resetDice();
+});
+
+function initializeGame(numPlayers) {
+    console.log("Starting game with " + numPlayers + " players");
+    nbrPlayers = numPlayers
+    // Game initialization logic goes here
+    // You can access the number of players using the 'numPlayers' parameter
+    // Assuming you have an array of player scores
+
+    playerScores = [];
+
+    for (let i = 0; i < numPlayers; i++) { 
+        playerScores[i] =  { player: 'P'+(i+1), score: [], bank: 0, current: 0 };
+    }
+
+    fillScore();
+
+    // Add the highlight-row class to the chosen row
+    currentPlayer = 0;
+    //var firstCell = rows[currentPlayer].querySelector('td:first-child');
+    const P = 'P' + (currentPlayer + 1);
+    $playerRow = $(`.${P}-row`);
+    $playerRow.addClass('left blue marked')
+    $(`.${P}`).html(`<i class="child icon"></i> ${P}`);
+    //let $firstCell = $playerRow.find('td:first-child');
+    //firstCell.classList.add('left blue marked');
+    //$firstCell.addClass('left blue marked');
+
+    $rollBtn[0].disabled = false;
+    $bankBtn[0].disabled = true;
+
+    for(const dice of diceArray) {
+        resetDice(dice.mesh.getObjectByName("outDice"));
+        //dice.mesh.getObjectByName("outDice").material[0].color = new THREE.Color(Math.random(), Math.random(), Math.random());
+        dice.mesh.getObjectByName("outDice").material[0].color = new THREE.Color(0xfafafa);
+    }
+
+    rows[currentPlayer].scrollIntoView();
+}
+
+function max_points(die_arr) {
+    /* 
+    Determine max points from an array of die
+    Constraints: die_arr.length <= 6, 1 <= die_arr[i] <= 6 
+    */
+    const combos = {}, used_dice = {};
+    let points = 0, triple_pairs;
+
+    for (let dice of die_arr) {
+        // Hashmap die rolls
+        combos[dice] = combos[dice] ? combos[dice] + 1 : 1;
+    }
+
+    for (let dice_num in combos) {
+        if (die_arr.length === 6) {
+            // all (6) die combos only
+
+            if (combos[dice_num] === 6)
+                // 6 of any number
+                return {points: 3000, dice: combos};
+
+            else if (Object.keys(combos).length === 6)
+                // straight
+                return {points: 1500, dice: combos};
+
+            else if (combos[dice_num] === 3 && Object.keys(combos).length === 2)
+                // (2) triplets
+                return {points: 2500, dice: combos};
+
+            else if (combos[dice_num] === 4 && Object.keys(combos).length === 2)
+                // 4 of any number + pair
+                return {points: 1500, dice: combos};
+
+            else if (triple_pairs === undefined && combos[dice_num] === 2 && Object.keys(combos).length === 3)
+                // 3 pairs
+                triple_pairs = true;
+        }
+
+        if (combos[dice_num] === 5) {
+            // 5 of any number
+            points += 2000;
+            used_dice[dice_num] = 5;
+        }
+
+        else if (combos[dice_num] === 4) {
+            // 4 of any number 
+            points += 1000;
+            used_dice[dice_num] = 4;
+        }
+
+        else if (combos[dice_num] === 3) {
+            if (+dice_num > 1)
+                // 3 of any number except one's
+                points += dice_num * 100;
+            else
+                // 3 of one's
+                points += 300;
+
+            used_dice[dice_num] = 3;
+            triple_pairs = false;
+        }
+
+        else if (+dice_num === 1) {
+            // single one's
+            points += combos[dice_num] * 100;
+            used_dice[dice_num] = combos[dice_num];
+        }
+
+        else if (+dice_num === 5) {
+            // single five's
+            points += combos[dice_num] * 50;
+            used_dice[dice_num] = combos[dice_num];
+        }
+    }
+
+    if (triple_pairs) return {points: 1500, dice: combos};
+
+    return {points: points, dice: used_dice};
+}
+
+function updateScores(i) {
+    let P = 'P' + (i + 1);
+    $(`${P}-bank`).html(playerScores[i].bank);
+    $(`${P}-current`).html(playerScore[i].current);
+}
+
+function fillScore() {
+    console.log("Building Scoreboard");
+
+    // Clear the existing table rows
+    $tbody.html('');
+
+    // Loop through the player scores and create table rows dynamically
+    for (let i = 0; i < playerScores.length; i++) {
+        let P = 'P' + (i + 1);
+        const player = playerScores[i].player;
+        const score = playerScores[i].score;
+        const bank = playerScores[i].bank;
+        const current = playerScores[i].current;
+
+        // Create a new table row
+        const $row = $('<tr />');
+        $row.addClass(`${P}-row`)
+
+        // Create a table cell for the player
+        const $playerCell = $('<td />');
+        $playerCell.addClass(`${P}`);
+        $playerCell.html(`<i class="male icon"></i> ${player}`);
+        $row.append($playerCell);
+
+        // Create a table cell for the score
+        const $scoreCell = $('<td />');
+        $scoreCell.addClass(`${P}-score`);
+
+        // Create three square box elements
+        for (let j = 0; j < 6; j++) {
+            const $box = $('<div />');
+            $box.addClass('dice-button');
+            switch (score[j]) {
+              case 1:
+                $box.html("&#9856;"); // Unicode character for face 1
+                break;
+              case 2:
+                $box.html("&#9857;"); // Unicode character for face 2
+                break;
+              case 3:
+                $box.html("&#9858;"); // Unicode character for face 3
+                break;
+              case 4:
+                $box.html("&#9859;"); // Unicode character for face 4
+                break;
+              case 5:
+                $box.html("&#9860;"); // Unicode character for face 5
+                break;
+              case 6:
+                $box.html("&#9861;"); // Unicode character for face 6
+                break;
+            }
+            $scoreCell.append($box);
+        }
+
+        $row.append($scoreCell);
+
+        const $bankCell = $('<td />')
+        $bankCell.addClass(`${P}-bank`);
+        $bankCell.html(bank);
+        $row.append($bankCell);
+        
+        const $currentCell = $('<td />')
+        $currentCell.addClass(`${P}-current`);
+        $currentCell.html(current);
+        $row.append($currentCell);
+        
+        // Append the row to the table body
+        $tbody.append($row);
+    }
+}
+
+function modifScore(i) {
+    let P = 'P' + (i + 1);
+    const score = playerScores[i].score;
+    const bank = playerScores[i].bank;
+    const current = playerScores[i].current;
+
+    console.log(`Changing ${P}'s Score`);
+  
+    // Get the existing row for the player (if it exists)
+    const existingRow = rows[i];
+    //const $existingRow = $rows.eq(i);
+    const $existingRow = $(`.${P}-row`);
+  
+    if ($existingRow) {
+      // Update the score cell for the player
+      const $scoreCell = $existingRow.find(`.${P}-score`);
+      $scoreCell.html(''); // Clear the existing score
+  
+      for (let j = 5; j >= 0; j--) {
+        const $box = $('<div />');
+        $box.addClass('dice-button');
+        switch (score[j]) {
+          case 1:
+            $box.html("&#9856;"); // Unicode character for face 1
+            break;
+          case 2:
+            $box.html("&#9857;"); // Unicode character for face 2
+            break;
+          case 3:
+            $box.html("&#9858;"); // Unicode character for face 3
+            break;
+          case 4:
+            $box.html("&#9859;"); // Unicode character for face 4
+            break;
+          case 5:
+            $box.html("&#9860;"); // Unicode character for face 5
+            break;
+          case 6:
+            $box.html("&#9861;"); // Unicode character for face 6
+            break;
+        }
+        $scoreCell.append($box);
+      }
+    }
+    console.log(playerScores);
+  }
+  
+
+function scoreCurrent() {
+    const sel = max_points(selected.values);
+    const newPoints = sel.points;
+    // console.log(sel.dice)
+
+    if (selected.quantity < 1) {
+        console.log("Must select at least one dice before scoring");
+    }
+    else if (newPoints === 0) {
+        console.log("No possible score from selected die");
+    }
+    else if (selected.quantity != Object.values(sel.dice).reduce((a,b)=> a+b,0)) {
+        console.log(`Not all die needed`);
+    }
+    else {
+        console.log(`Selected ${selected.quantity} die at values ${selected.values}`);
+
+        playerScore.current += newPoints;
+        updateScores();
+
+        DICE.length -= selected.quantity;
+        selected = { quantity: 0, values: [] };
+
+        if (DICE.length === 0) DICE.length = 6; // If all die used, reset to 6 die
+
+        $("#roll-btn").css("visibility", "visible");
+        $("#score-btn").css("visibility", "hidden");
+        $("#bank-btn").css("visibility", "visible");
+    }
+}
+
+function nextPlayer() {
+
+    if(!isStable || rows.length < 1){
+        return;
+    }
+    const oldP = 'P' + (currentPlayer + 1);
+    // Remove old
+    const $oldRow = $(`.${oldP}-row`)
+    $oldRow.removeClass('left blue marked');
+    $(`.${oldP}`).html(`<i class="male icon"></i> ${oldP}`);
+
+    // Update score
+    modifScore(currentPlayer);
+
+    currentPlayer = currentPlayer + 1
+
+    playerScores[currentPlayer].score = [];
+    //playerScores[currentPlayer].throws = 0;
+    $rollBtn[0].disabled = false;
+    $bankBtn[0].disabled = true;
+
+    for(const dice of diceArray) {
+        resetDice(dice.mesh.getObjectByName("outDice"));
+    }
+
+    const newP = 'P' + (currentPlayer + 1);
+    const $newRow = $(`.${newP}-row`);
+    $newRow.addClass('left blue marked');
+    $(`.${newP}`).html(`<i class="child icon"></i> ${newP}`);
+    //const row = rows[currentPlayer];
+    //cell = row.querySelector('td:first-child');
+    //cell.classList.add('left blue marked');
+
+    $newRow[0].scrollIntoView({ block: "end" });
+}
+
+function calculateGlobalScore() {
+    console.log("Calculating scores");
+    var totalPoints = 0;
+    var loser = 0;
+    var currentWorst = 100000;
+    var combiWorst = 100000;
+    var current = 0;
+    var point = 0;
+
+    for (let i = 0; i < playerScores.length; i++) { 
+
+        [current, point] = max_points(playerScores[i].score);
+        totalPoints += point;
+
+        if (current < currentWorst) {
+            currentWorst = current;
+            combiWorst = getCombi(playerScores[i].score);
+            loser = i;
+        }
+    }
+
+    const message = `P${loser + 1} lost the round with ${combiWorst}, the total was ${totalPoints} pts`;
+    alert(message);
+}
+
+function calculatePoints(arr) {
+    const first = arr[2];
+    const second = arr[1];
+    const third = arr[0];
+
+    if (first === 4 && second === 2 && third === 1) {
+        return [10000, 8];
+    }
+
+    if (first === 1) {
+        if (third === 1) {
+            return [7000, 7];
+        } else {
+            return [1000 * third, third];
+        }
+    }
+
+    if (first === second && first === third) {
+        return [1000 + 100 * first + 10 * second + third, third];
+    }
+
+    if (first === second + 1 && second === third + 1) {
+        return [700 + 100 * (first - 3), 2];
+    }
+
+    if (first === 2 && second === 2 && third === 2) {
+        return [221, 4];
+    }
+
+    return [100 * first + 10 * second + third, 1];
+}  
+
+function getCombi(arr) {
+    return 100 * arr[2] + 10 * arr[1] + arr[0];
+}
+
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+///////////////////  Events  ///////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+
+function onMouseDown(event) {
+
+    if(!isStable){
+        return;
+    }
+
+    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    raycaster.setFromCamera( pointer, camera );
+
+    const intersects = raycaster.intersectObjects( scene.children, true );
+
+    if ( intersects.length > 0 ) {
+
+        for (let i = 0; i < intersects.length; i++) {
+            const intersectedObject = intersects[i].object;
+        
+            if (intersectedObject.name === "outDice") {
+                toggleDice(intersectedObject);
+                break; // Exit the loop after toggling one dice
+            }
+        }
+
+    }
+}
+
+function toggleDice(diceOutMesh) {
+    console.log("Toggle dice : " + diceOutMesh.index);
+    diceOutMesh.isToggled = !diceOutMesh.isToggled;
+    if (diceOutMesh.isToggled) {
+        diceOutMesh.material[0].color.set(0x00ff00);
+        diceArray[diceOutMesh.index].body.mass = 1000;
+        diceArray[diceOutMesh.index].body.updateMassProperties();
+    } else {
+        diceOutMesh.material[0].color.set(0xeeeeee);
+        diceArray[diceOutMesh.index].body.mass = 1;
+        diceArray[diceOutMesh.index].body.updateMassProperties();
+    }
+}
+
+function resetDice(diceOutMesh) {
+    console.log("Reset dice : " + diceOutMesh.index);
+    if (diceOutMesh.isToggled) {
+        diceOutMesh.isToggled = false;
+        diceOutMesh.material[0].color.set(0xeeeeee);
+        diceArray[diceOutMesh.index].body.mass = 1;
+        diceArray[diceOutMesh.index].body.updateMassProperties();
+    }
+}
+
+function throwDice() {
+
+    if(!isStable) {
+        console.log("Dice are not stable !");
+        return;
+    }
+
+    if(!isGameStarted) {
+        isGameStarted = true;
+    }
+    
+    var oneMoved = false;
+
+    diceArray.forEach((d, dIdx) => {
+        if (d.body.mass === 1000) {
+            return;
+        }
+        oneMoved = true;
+    
+        stableCnt--;
+
+        throwDie(d, dIdx)
+    });
+
+    isStable = !oneMoved;
+}
+
+function throwDie(d, dIdx) {
+    d.body.velocity.setZero();
+    d.body.angularVelocity.setZero();
+
+    d.body.position = new CANNON.Vec3(5, dIdx * 1.5 + 10, 0);
+    d.mesh.position.copy(d.body.position);
+
+    d.mesh.rotation.set(2 * Math.PI * Math.random(), 0, 2 * Math.PI * Math.random())
+    d.body.quaternion.copy(d.mesh.quaternion);
+
+    const forceX = 5 + 25 * Math.random();
+    const forceY = 5 + 25 * Math.random();
+    d.body.applyImpulse(
+        new CANNON.Vec3(-forceX, -forceY, 0),
+        new CANNON.Vec3(0, Math.random(), Math.random())
+    );
+
+    d.body.allowSleep = true;
+}
+
+function addDiceEvents(dice) {
+    dice.body.addEventListener('sleep', (e) => {
+
+        dice.body.allowSleep = false;
+
+        const euler = new CANNON.Vec3();
+        e.target.quaternion.toEuler(euler);
+
+        const eps = .1;
+        let isZero = (angle) => Math.abs(angle) < eps;
+        let isHalfPi = (angle) => Math.abs(angle - .5 * Math.PI) < eps;
+        let isMinusHalfPi = (angle) => Math.abs(.5 * Math.PI + angle) < eps;
+        let isPiOrMinusPi = (angle) => (Math.abs(Math.PI - angle) < eps || Math.abs(Math.PI + angle) < eps);
+
+        if (isZero(euler.z)) {
+            if (!isZero(euler.x) && !isHalfPi(euler.x) && !isMinusHalfPi(euler.x) && !isPiOrMinusPi(euler.x)) {
+                // landed on edge => wait to fall on side and fire the event again
+                console.log("Is Stuck ?");
+                dice.body.allowSleep = true;
+            }
+        } else if (!isHalfPi(euler.z) && !isMinusHalfPi(euler.z)) {
+            // landed on edge => wait to fall on side and fire the event again
+            console.log("Is Stuck ?");
+            dice.body.allowSleep = true;
+        }
+
+        stableCnt++;
+        checkAllStable();
+
+    });
+}
+
+function calculateValue(dice, diceId) {
+
+    const euler = new CANNON.Vec3();
+    dice.body.quaternion.toEuler(euler);
+
+    const eps = .1;
+    let isZero = (angle) => Math.abs(angle) < eps;
+    let isHalfPi = (angle) => Math.abs(angle - .5 * Math.PI) < eps;
+    let isMinusHalfPi = (angle) => Math.abs(.5 * Math.PI + angle) < eps;
+    let isPiOrMinusPi = (angle) => (Math.abs(Math.PI - angle) < eps || Math.abs(Math.PI + angle) < eps);
+
+    var scoreArr = playerScores[currentPlayer].score;
+
+    if (isZero(euler.z)) {
+        if (isZero(euler.x)) {
+            scoreArr[diceId] = 1;
+        } else if (isHalfPi(euler.x)) {
+            scoreArr[diceId] = 4;
+        } else if (isMinusHalfPi(euler.x)) {
+            scoreArr[diceId] = 3;
+        } else if (isPiOrMinusPi(euler.x)) {
+            scoreArr[diceId] = 6;
+        } else {
+            // landed on edge => wait to fall on side and fire the event again
+            console.log("Is Stuck ?");
+        }
+    } else if (isHalfPi(euler.z)) {
+        scoreArr[diceId] = 2;
+    } else if (isMinusHalfPi(euler.z)) {
+        scoreArr[diceId] = 5;
+    } else {
+        // landed on edge => wait to fall on side and fire the event again
+        console.log("Is Stuck ?");
+    }
+}
+
+function calculateCombi(newScores) {
+    // Sort the array in desc order
+
+    newScores.sort(function(a, b) {
+        return a - b;
+    });
+
+    // Handle double 1
+    if (newScores[1] == 1) {
+        newScores[0] = newScores[2];
+        newScores[2] = 1;
+        return;
+    }
+
+    // Handle 221
+    if (newScores[2] == 2 && newScores[1] == 2 && newScores[0] == 1 ) {
+        alert("You are quite bad at this game...");
+    }
+}
+
+function checkAllStable() {
+
+    if(stableCnt != diceArray.length) {
+        console.log("Some dice are not stable...")
+        return;
+    }
+    var checkStable = true;
+
+    diceArray.forEach((d, dIdx) => {
+        if(d.body.allowSleep) {
+            checkStable = false;
+            stableCnt--;
+            throwDie(d, dIdx);
+        }
+    });
+
+    isStable = checkStable;
+
+    if (isStable) {
+        console.log("Dice are stable !");
+
+        if(!isGameStarted){
+            return;
+        }
+
+        //playerScores[currentPlayer].throws = playerScores[currentPlayer].throws + 1;
+        for (let i = 0; i < diceArray.length; i++) {
+            calculateValue(diceArray[i], i);
+        }
+        console.log("Changed dice value");
+        
+        calculateCombi(playerScores[currentPlayer].score);
+
+        // Update score and throws
+        modifScore(currentPlayer);
+        $bankBtn[0].disabled = false;
+
+    }
+}
+
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+/////////////////  Rendering  //////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+
+function render() {
+    physicsWorld.fixedStep();
+
+    for (const dice of diceArray) {
+        dice.mesh.position.copy(dice.body.position)
+        dice.mesh.quaternion.copy(dice.body.quaternion)
+    }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(render);
+}
+
+function updateSceneSize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+///////////////  Scene Element   ///////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+
+function initScene() {
+
+    renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: true,
+        canvas: canvasEl
+    });
+    renderer.shadowMap.enabled = true
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .1, 100)
+    camera.position.set(0, 30, 30);
+
+    // Orbit controls
+    controls = new OrbitControls(camera, renderer.domElement)
+    controls.rotateSpeed = 1.0
+    controls.zoomSpeed = 1.2
+    controls.enableDamping = true
+    controls.enablePan = false
+    controls.dampingFactor = 0.2
+    controls.minDistance = 1
+    controls.maxDistance = 40
+
+    updateSceneSize();
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, .5);
+    scene.add(ambientLight);
+    const topLight = new THREE.PointLight(0xffffff, .5);
+    topLight.position.set(10, 15, 0);
+    topLight.castShadow = true;
+    topLight.shadow.mapSize.width = 2048;
+    topLight.shadow.mapSize.height = 2048;
+    topLight.shadow.camera.near = 5;
+    topLight.shadow.camera.far = 400;
+    scene.add(topLight);
+    
+    createBorders();
+
+    for (let i = 0; i < params.numberOfDice; i++) {
+        diceArray.push(createDice(i));
+        addDiceEvents(diceArray[i]);
+    }
+
+    render();
+}
+
+function initPhysics() {
+    physicsWorld = new CANNON.World({
+        allowSleep: true,
+        gravity: new CANNON.Vec3(0, -50, 0),
+    })
+    physicsWorld.defaultContactMaterial.restitution = .3;
+}
+
+function createBorders() {
+
+    const wallMaterial = new THREE.ShadowMaterial({
+        opacity: .1
+    });
+
+    // Floor
+    const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(13, 13),
+        wallMaterial
+    );
+    floor.name = "wall";
+    floor.receiveShadow = true;
+
+    // Create the border line
+    const edges = new THREE.EdgesGeometry(floor.geometry);
+    const borderMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+    const borderLine = new THREE.LineSegments(edges, borderMaterial);
+    borderLine.position.copy(floor.position);
+    borderLine.position.y += 0.01; // Raise the line slightly above the floor
+    borderLine.rotation.x = -Math.PI / 2; // Rotate the line to align with the floor
+    scene.add(borderLine);
+
+    // Rotate the plane along the x-axis
+    floor.quaternion.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI * 0.5);
+    
+    scene.add(floor);
+
+    const floorBody = new CANNON.Body({
+        type: CANNON.Body.STATIC,
+        shape: new CANNON.Plane(),
+    });
+    floorBody.position.copy(floor.position);
+    floorBody.quaternion.copy(floor.quaternion);
+    physicsWorld.addBody(floorBody);
+
+    // Walls
+    const wallOptions = {
+        width: 14,
+        height: 15,
+        depth: 1,
+    };
+
+    function createWall(x, z, isParallel) {
+
+        if (isParallel) {
+
+            const wall = new THREE.Mesh(
+                new THREE.BoxGeometry(wallOptions.depth, wallOptions.height, wallOptions.width),
+                wallMaterial
+            );
+            wall.position.set(x, wallOptions.height * 0.5, z);
+            wall.receiveShadow = true;
+            wall.name = "wall";
+            scene.add(wall);
+
+            const wallBody = new CANNON.Body({
+                type: CANNON.Body.STATIC,
+                shape: new CANNON.Box(new CANNON.Vec3(wallOptions.depth * 0.5, wallOptions.height * 0.5, wallOptions.width * 0.5)),
+            });
+            wallBody.position.copy(wall.position);
+            physicsWorld.addBody(wallBody);
+
+        } else {
+
+            const wall = new THREE.Mesh(
+                new THREE.BoxGeometry(wallOptions.width, wallOptions.height, wallOptions.depth),
+                wallMaterial
+            );
+            wall.position.set(x, wallOptions.height * 0.5, z);
+            wall.receiveShadow = true;
+            wall.name = "wall";
+            scene.add(wall);
+
+            const wallBody = new CANNON.Body({
+                type: CANNON.Body.STATIC,
+                shape: new CANNON.Box(new CANNON.Vec3(wallOptions.width * 0.5, wallOptions.height * 0.5, wallOptions.depth * 0.5)),
+            });
+            wallBody.position.copy(wall.position);
+            physicsWorld.addBody(wallBody);
+        }
+
+    }
+
+    createWall(-wallOptions.width * 0.5, 0, true); // Left wall
+    createWall(wallOptions.width * 0.5, 0, true); // Right wall
+    createWall(0, -wallOptions.width * 0.5, false); // Back wall
+    createWall(0, wallOptions.width * 0.5, false); // Front wall
+
+}
+
+function createDiceMesh(id) {
+
+    const diceMesh = new THREE.Group();
+
+    // Create a material loader
+    const mtlLoader = new MTLLoader();
+
+    // Load the .mtl file
+    mtlLoader.load('data:@file/octet-stream;base64,bmV3bXRsIGJsYWNrDQpOcyA5Ni4wNzg0NTMNCkthIDEuMDAwMDAwIDEuMDAwMDAwIDEuMDAwMDAwDQpLZCAwLjAwMDAwMCAwLjAwMDAwMCAwLjAwMDAwMA0KS3MgMC41MDAwMDAgMC41MDAwMDAgMC41MDAwMDANCktlIDAuMDAwMDAwIDAuMDAwMDAwIDAuMDAwMDAwDQpOaSAxLjAwMDAwMA0KZCAxLjAwMDAwMA0KaWxsdW0gMg0KDQpuZXdtdGwgd2hpdGUNCk5zIDk2LjA3ODQ1Mw0KS2EgMS4wMDAwMDAgMS4wMDAwMDAgMS4wMDAwMDANCktkIDEuMDAwMDAwIDEuMDAwMDAwIDEuMDAwMDAwDQpLcyAwLjUwMDAwMCAwLjUwMDAwMCAwLjUwMDAwMA0KS2UgMC4wMDAwMDAgMC4wMDAwMDAgMC4wMDAwMDANCk5pIDEuMDAwMDAwDQpkIDEuMDAwMDAwDQppbGx1bSAy', (materials) => {
+        materials.preload();
+
+        const loader = new OBJLoader();
+        loader.setMaterials(materials);
+
+            loader.load('dice.obj', function (object) {
+            // Callback function called when the model is loaded
+
+            // Set the material for the loaded object
+            object.traverse(function (child) {
+                if (child instanceof THREE.Mesh) {
+                    child.castShadow = true;
+                    child.name = "outDice";
+                    child.isToggled = false;
+                    child.index = id;
+                }
+            });
+
+
+            object.rotation.set(0, Math.PI / 2, 0);
+
+            // Get the bounding box of the mesh
+            const boundingBox = new THREE.Box3().setFromObject(object);
+
+            // Calculate the size of the bounding box
+            const boundingBoxSize = new THREE.Vector3();
+            boundingBox.getSize(boundingBoxSize);
+
+            // Calculate the scale factor for resizing
+            const scaleFactor = new THREE.Vector3(
+                1.05 / boundingBoxSize.x,
+                1.05 / boundingBoxSize.y,
+                1.05 / boundingBoxSize.z
+            );
+            object.scale.copy(scaleFactor);
+
+            diceMesh.add(object);
+
+        },
+        function( xhr ){
+            console.log( (xhr.loaded / xhr.total * 100) + "% loaded")
+        },
+        function( err ){
+            console.error( "Error loading .obj")
+        });
+    });
+
+    return diceMesh;
+}
+
+function createDice(id) {
+    const mesh = createDiceMesh(id);
+
+    scene.add(mesh);
+
+    const body = new CANNON.Body({
+        mass: 1,
+        shape: new CANNON.Box(new CANNON.Vec3(.5, .5, .5)),
+        sleepTimeLimit: .1
+    });
+    physicsWorld.addBody(body);
+
+    return {mesh, body};
+}
+        </script>
+    </head>
+
+    <body>
+        <main class="ui container">
+                <div id="welcome" class="ui blue stacked segment">
+                    <div class="ui fluid statistic">
+                        <div class="value">10,000</div>
+                        <div class="label">Farkle</div>
+                    </div>
+                    <h2 class="ui header">
+                      <i class="settings icon"></i>
+                      <div class="content">
+                        Configuration
+                        <div class="sub header">Customize Gameplay</div>
+                      </div>
+                    </h2>
+                    <div class="ui secondary center aligned segment">
+                        There's going to be
+                        <div id="players" class="ui inline compact dropdown">
+                            <input type="hidden" id="player-input" name="players" value="2">
+                            <div class="text">two</div>
+                            <i class="dropdown icon"></i>
+                            <div class="menu">
+                                <div class="item" data-value="1">one</div>
+                                <div class="item" data-value="2">two</div>
+                                <div class="item" data-value="3">three</div>
+                                <div class="item" data-value="4">four</div>
+                                <div class="item" data-value="5">five</div>
+                                <div class="item" data-value="6">six</div>
+                                <div class="item" data-value="7">seven</div>
+                            </div>
+                        </div>
+                        players..
+                    </div>
+                    <button class="ui primary button" id="play-btn">Play</button>
+                    <button class="ui primary right floated button" id="rules-btn" data-tooltip="Learn to play or review the scoring chart." data-variation="tiny basic">Gameplay</button>
+                </div>
+                
+                <div id="rules" class="ui blue stacked segment">
+                    <div class="ui fluid statistic">
+                        <div class="value">10,000</div>
+                        <div class="label">Farkle</div>
+                    </div>
+                    </div>
+                    <h2 class="ui header">Gameplay</h2>
+                    <div class="ui secondary center aligned segment">
+                        ..
+                    </div>
+                    <button class="ui primary button" id="play-btn">Play</button>
+                    <button class="ui primary right floated button" id="back-btn">Back</button>
+                </div>
+
+                <div id="game" class="ui blue stacked segement">
+                    <table id="score-table" class="ui blue small celled short unstackable scrolling striped compact table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Holding</th>
+                                <th class="right aligned">Score</th>
+                                <th class="right aligned">Current</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table rows for each player's score will be dynamically added here -->
+                        </tbody>
+                    </table>
+                    <div class="ui relaxed buttons">
+                        <button class="ui primary button" id="roll-btn">Throw Dice</button>
+                        <button class="ui primary button" id="bank-btn">Bank Score</button>
+                        <button class="ui primary button" id="score-btn">Score Current</button>
+                    </div>
+                    <canvas id="canvas"></canvas>
+                </div>
+        </main>
+    </body>
+
+</html>

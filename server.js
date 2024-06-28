@@ -1,161 +1,113 @@
-const express = require("express");
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const Game = require('./gameclass');
+const Player = require('./game/player');
+
 const app = express();
-const http = require("http").Server(app);
-const io = require("socket.io")(http);
-const gameclass = require("./gameclass");
+const server = http.createServer(app);
+const io = socketIo(server);
 const port = process.env.PORT || 3030;
-var rooms = [];
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/lobby.html");
+let rooms = [];
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/lobby.html');
 });
 
-app.get("/api/newgame/", (req, res) => {
-  var NewGame = new gameclass();
-  res.send({ Name: NewGame.Name });
-  var nsp = io.of("/" + NewGame.Name);
-  rooms.push(NewGame);
-  nsp.on("connection", (socket) => {
-    try {
-      socket.on("playerjoin", (player) => {
-        if (!NewGame.started) {
-          if (NewGame.players.length == 0) {
-            NewGame.players.push({
-              name: player.name,
-              id: socket.id,
-              host: true,
-              score: 0,
-            });
-          } else {
-            NewGame.players.push({
-              name: player.name,
-              id: socket.id,
-              host: false,
-              score: 0,
-            });
-          }
-          nsp.emit("playerupdate", NewGame.players);
-          console.log(NewGame.players);
-        }
-      });
-      socket.on("GameStart", () => {
-        console.log(socket.id, NewGame.players);
-        console.log(NewGame.isHost(socket));
-        if (NewGame.isHost(socket)) {
-          NewGame.started = true;
-        }
-        NewGame.turnindex = Math.floor(Math.random() * NewGame.players.length);
-        nsp.emit("newturn", NewGame.players[NewGame.turnindex]);
-        nsp.emit("playerupdate", NewGame.players, NewGame.turnindex);
-      });
-      socket.on("roll", (diceindex) => {
-        if (
-          socket.id == NewGame.players[NewGame.turnindex].id &&
-          NewGame.started == true
-        ) {
-          console.log("player rolled index: ", diceindex);
-          if (!NewGame.roll(diceindex)) {
-            nsp.emit("roll_Return", NewGame.dice);
-            NewGame.nextturn();
-            //if roll returns false it means that a farkle happened
-            nsp.emit("newturn", NewGame.players[NewGame.turnindex]);
-            nsp.emit("playerupdate", NewGame.players, NewGame.turnindex);
-            console.log(
-              "It is ",
-              NewGame.players[NewGame.turnindex].name,
-              "'s turn",
-            );
-          } else {
-            nsp.emit("roll_Return", NewGame.dice);
-          }
-        } else {
-          console.log(
-            socket.id +
-              " tried to roll but it is " +
-              NewGame.players[NewGame.turnindex].id +
-              " turn",
-          );
-        }
-      });
-      socket.on("bank", () => {
-        if (NewGame.Bank(socket)) {
-          nsp.emit("playerupdate", NewGame.players, NewGame.turnindex);
-          nsp.emit("newturn", NewGame.players[NewGame.turnindex]);
-        }
-        if (
-          NewGame.players.filter((player) => {
-            return player.score >= NewGame.scoreToWin;
-          }).length == 1
-        ) {
-          console.log(
-            NewGame.players.filter((player) => {
-              return player.score >= NewGame.scoreToWin;
-            }),
-          );
-          nsp.emit(
-            "gamewon",
-            NewGame.players.filter((player) => {
-              return player.score >= NewGame.scoreToWin;
-            })[0],
-          );
-        }
-      });
+app.get('/api/newgame', (req, res) => {
+    const newGame = new Game();
+    rooms.push(newGame);
 
-      socket.on("msg", (msg) => {
-        console.log(socket.id + " sent: " + msg);
+    const namespace = io.of('/' + newGame.Name);
+    namespace.on('connection', socket => {
+        handleSocketConnection(socket, namespace, newGame);
+    });
 
-        socket.broadcast.emit("msg", {
-          msg: msg,
-          sender: NewGame.players.filter((player) => socket.id == player.id)[0]
-            .name,
-        });
-      });
-      socket.on("disconnect", () => {
-        console.log(socket.id + " disconnected");
-        nsp.emit(
-          "playerDisconect",
-          NewGame.players.filter((player) => {
-            return player.id == socket.id;
-          })[0],
-        );
-        if (
-          app._router.stack.findIndex((x) => {
-            return x.path == "/" + NewGame.Name;
-          }) != -1
-        ) {
-          app._router.stack.findIndex((x) => {
-            return x.path == "/" + NewGame.Name;
-          });
-          app._router.stack.splice(
-            app._router.stack.findIndex((x) => {
-              return x.path == "/" + NewGame.Name;
-            }),
-            1,
-          );
-        }
-        rooms = rooms.filter((room) => {
-          return !NewGame == room;
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  });
-  app.get("/" + NewGame.Name, (req, res) => {
-    res.sendFile(__dirname + "/public/game.html");
-  });
-});
-app.get("/api/getrooms", (req, res) => {
-  res.send({
-    rooms: rooms,
-  });
-});
-app.get("/rules", (req, res) => {
-  res.sendFile(__dirname + "/public/rules.html");
+    app.get('/' + newGame.Name, (req, res) => {
+        res.sendFile(__dirname + '/public/game.html');
+    });
+
+    res.send({ Name: newGame.Name });
 });
 
-app.use(express.static(__dirname + "/public"));
-
-http.listen(port, function () {
-  console.log("listening on port: " + port);
+app.get('/api/getrooms', (req, res) => {
+    res.send({ rooms: rooms.map(room => room.Name) });
 });
+
+app.get('/rules', (req, res) => {
+    res.sendFile(__dirname + '/public/rules.html');
+});
+
+app.use(express.static(__dirname + '/public'));
+
+server.listen(port, () => {
+    console.log('Listening on port: ' + port);
+});
+
+function handleSocketConnection(socket, namespace, game) {
+    socket.on('playerjoin', player => {
+        if (!game.started) {
+            game.addPlayer(player.name, socket.id);
+            namespace.emit('playerupdate', game.players);
+        }
+    });
+
+    socket.on('GameStart', () => {
+        if (game.isHost(socket)) {
+            game.started = true;
+            game.turnindex = Math.floor(Math.random() * game.players.length);
+            namespace.emit('newturn', game.players[game.turnindex]);
+            namespace.emit('playerupdate', game.players, game.turnindex);
+        }
+    });
+
+    socket.on('roll', diceIndex => {
+        if (socket.id === game.players[game.turnindex].id && game.started) {
+            if (!game.roll(diceIndex)) {
+                namespace.emit('roll_Return', game.dice);
+                game.nextturn();
+                namespace.emit('newturn', game.players[game.turnindex]);
+                namespace.emit('playerupdate', game.players, game.turnindex);
+            } else {
+                namespace.emit('roll_Return', game.dice);
+            }
+        }
+    });
+
+    socket.on('bank', () => {
+        if (game.bank(socket)) {
+            namespace.emit('playerupdate', game.players, game.turnindex);
+            namespace.emit('newturn', game.players[game.turnindex]);
+            if (game.hasWon()) {
+                const winner = game.players.find(player => player.score >= game.scoreToWin);
+                namespace.emit('gamewon', winner);
+            }
+        }
+    });
+
+    socket.on('msg', msg => {
+        const sender = game.players.find(player => player.id === socket.id);
+        if (sender) {
+            socket.broadcast.emit('msg', { msg, sender: sender.name });
+        }
+    });
+    
+    socket.on('addmsg', msg => {
+        const sender = game.players.find(player => player.id === socket.id);
+        if (sender) {
+            socket.broadcast.emit('addmsg', { msg, sender: sender.name });
+        }
+    });
+
+    socket.on('disconnect', () => {
+        const player = game.players.find(player => player.id === socket.id);
+        if (player) {
+            namespace.emit('playerDisconect', player);
+            game.players = game.players.filter(p => p.id !== socket.id);
+            if (game.players.length === 0) {
+                rooms = rooms.filter(room => room !== game);
+            }
+        }
+    });
+}

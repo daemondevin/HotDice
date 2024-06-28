@@ -1,11 +1,11 @@
 {
-  "name": "10000",
+  "name": "farkle-and-friends",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node backend.js"
   },
   "keywords": [
     "game",
@@ -15,7 +15,9 @@
   "author": "Devin Gaul",
   "license": "",
   "dependencies": {
+    "@webcomponents/webcomponentsjs": "^2.8.0",
     "express": "^4.16.3",
+    "jsdom": "^24.1.0",
     "socket.io": "^2.0.4",
     "socket.js": "^0.1.4"
   },
